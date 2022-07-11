@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         courseList = ArrayList<String>()
         stacksList = ArrayList<String>()
         stackMap = HashMap<String, CardStack>()
+        courseJSON = ""
         swipeContainer = findViewById(R.id.swipeContainer)
 
         //FILL LISTS
@@ -59,6 +60,30 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             }
             swipeContainer.isRefreshing = false
         })
+
+        //SaveInstanceState
+        if (savedInstanceState != null) {
+            savedInstanceState.getString("courseJSON")?.let {
+                courseJSON = it
+            }
+            savedInstanceState.getStringArrayList("courseList")?.let {
+                courseList = it
+            }
+            savedInstanceState.getStringArrayList("stacksList")?.let {
+                stacksList = it
+            }
+            initArrayAdapters()
+            savedInstanceState.getBoolean("hasStacksAdapter").let {
+                if (it) recyclerView.adapter = stacksAdapter
+                else recyclerView.adapter = courseAdapter
+            }
+            savedInstanceState.getSerializable("stackMap")?.let {
+                stackMap = it as HashMap<String, CardStack>
+            }
+            initSwipeDeleteFunction()
+        }
+
+
     }
 
     private fun initSwipeDeleteFunction() {
@@ -89,8 +114,8 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
     /* Initialize the array adapters */
     private fun initArrayAdapters() {
-        courseAdapter = SimpleAdapter(courseList, this)
-        stacksAdapter = SimpleAdapter(stacksList, this)
+        courseAdapter = SimpleAdapter(courseList, this, "courseAdapter")
+        stacksAdapter = SimpleAdapter(stacksList, this, "stacksAdapter")
     }
 
     override fun onBackPressed() {
@@ -211,4 +236,14 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             startActivity(intent)
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("courseJSON", courseJSON)
+        outState.putBoolean("hasStacksAdapter", recyclerView.adapter == stacksAdapter)
+        outState.putStringArrayList("stacksList", stacksList)
+        outState.putStringArrayList("courseList", courseList)
+        outState.putSerializable("stackMap", stackMap)
+    }
+
 }

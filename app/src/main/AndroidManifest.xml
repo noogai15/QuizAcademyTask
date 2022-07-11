@@ -14,6 +14,7 @@
         android:theme="@style/Theme.QuizAcademyTask">
         <activity
             android:name=".FlashcardStackActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
