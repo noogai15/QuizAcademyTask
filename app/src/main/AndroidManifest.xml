@@ -14,7 +14,6 @@
         android:theme="@style/Theme.QuizAcademyTask">
         <activity
             android:name=".FlashcardStackActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -31,7 +30,6 @@
         <meta-data
             android:name="apiKey"
             android:value="${API_KEY}" />
-        />
     </application>
 
 </manifest>

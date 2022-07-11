@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-land/flashcard_land.xml" value="0.20282186948853614" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-land/fragment_card.xml" value="0.20282186948853614" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/activity_flashcard_stack.xml" value="0.2346014492753623" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/content_main.xml" value="0.18802083333333333" />

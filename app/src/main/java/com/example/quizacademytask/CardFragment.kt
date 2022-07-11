@@ -39,7 +39,10 @@ class CardFragment : Fragment() {
 
         // Inflate the layout for this fragment
         //INITS
-        val view: View = inflater.inflate(R.layout.fragment_card, container, false)
+
+        var view: View = inflater.inflate(R.layout.fragment_card, container, false)
+//        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+//            view = inflater.inflate(R.layout, container, false)
         topicTV = view.findViewById(R.id.topicTV)
         textTV = view.findViewById(R.id.textTV)
         cardType = view.findViewById(R.id.card_type)
@@ -62,4 +65,5 @@ class CardFragment : Fragment() {
         }
         return view
     }
+//Check if device rotated and if so, update the layout accordingly to landscape or portrait
 }
