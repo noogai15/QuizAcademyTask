@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -19,10 +18,8 @@ import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import java.io.*
 
-
 class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var swipeContainer: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
@@ -37,11 +34,9 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-
 
         //INITS
         recyclerView = findViewById(R.id.recyclerView)
@@ -50,14 +45,10 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         stackMap = HashMap<String, CardStack>()
         swipeContainer = findViewById(R.id.swipeContainer)
 
-
         //FILL LISTS
         courseList.add("BWL Grundlagen")
 
-
-        //INIT ARRAY ADAPTERS
         initArrayAdapters()
-
         recyclerView.adapter = courseAdapter
 
         //SWIPE REFRESH SETTINGS
@@ -68,8 +59,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             }
             swipeContainer.isRefreshing = false
         })
-
-
     }
 
     private fun initSwipeDeleteFunction() {
@@ -98,6 +87,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         touchHelper.attachToRecyclerView(recyclerView)
     }
 
+    /* Initialize the array adapters */
     private fun initArrayAdapters() {
         courseAdapter = SimpleAdapter(courseList, this)
         stacksAdapter = SimpleAdapter(stacksList, this)
@@ -107,6 +97,14 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         recyclerView.adapter = courseAdapter
     }
 
+    /* Create a Course from JSON */
+    private fun createCourse(jsonString: String): Course {
+        val course = Gson().fromJson(jsonString, Course::class.java);
+        this.course = course
+        return course
+    }
+
+    /* Read JSON from file */
     @Throws(JsonSyntaxException::class)
     fun readJSON(file: File): String {
         val bReader: BufferedReader = BufferedReader(FileReader(file))
@@ -119,17 +117,10 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         return s.toString()
     }
 
-    fun createCourse(jsonString: String): Course {
-        val course = Gson().fromJson(jsonString, Course::class.java);
-        this.course = course
-        return course
-    }
-
+    /* Write JSON file to storage */
     fun writeJSON(fileName: String, jsonString: String): File {
         val dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        if (!dir?.exists()!!) {
-            dir.mkdir()
-        }
+        if (!dir?.exists()!!) dir.mkdir()
         val file: File = File(dir.path, "$fileName.json")
 
         try {
@@ -143,14 +134,16 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         return file
     }
 
-    fun getRequest() {
+    /* Send GET request to API and switch adapter to card stacks */
+    private fun getRequest() {
         val url = "https://api.quizacademy.io/quiz-dev/public/courses/28"
         val client = OkHttpClient()
-        val ai: ApplicationInfo = applicationContext.packageManager
-            .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
+        val ai: ApplicationInfo = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName,
+            PackageManager.GET_META_DATA
+        )
         val value: String = ai.metaData["apiKey"] as String
 
-        //TODO: Use env variable or similar for x-api-key
         val request: Request = Request.Builder()
             .header("x-api-key", value)
             .url(url)
@@ -180,13 +173,8 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
                     )
                     courseJSON = readJSON(file)
                     runOnUiThread(Runnable {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Downloaded course",
-                            Toast.LENGTH_SHORT
-                        )
+                        Toast.makeText(this@MainActivity, "Downloaded course", Toast.LENGTH_SHORT)
                             .show()
-
                         refillStacksList(courseJSON)
                         recyclerView.adapter = stacksAdapter
                         initSwipeDeleteFunction()
@@ -197,6 +185,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         })
     }
 
+    /* Refill the card stacks list */
     fun refillStacksList(jsonString: String): SimpleAdapter {
         stacksList.clear()
         val course = createCourse(jsonString)
@@ -209,7 +198,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         return stacksAdapter
     }
 
-
+    /* OnClickListener for the course list, navigate to the flashcards if clicked on a card stack */
     override fun onItemClick(position: Int, v: View?) {
         if (recyclerView.adapter == courseAdapter) {
             getRequest()
@@ -222,5 +211,4 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             startActivity(intent)
         }
     }
-
 }

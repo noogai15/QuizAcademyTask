@@ -24,7 +24,6 @@ class SimpleAdapter(
     }
 
     @SuppressLint("ResourceAsColor")
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = list[position]
         holder.row.text = currentItem
