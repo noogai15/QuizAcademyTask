@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         stacksList = ArrayList<String>()
         stackMap = HashMap<String, CardStack>()
         courseJSON = ""
-        swipeContainer = findViewById(R.id.swipeContainer)
+        swipeContainer = binding.swipeContainer
 
         //FILL LISTS
         courseList.add("BWL Grundlagen")

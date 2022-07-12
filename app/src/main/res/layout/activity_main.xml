@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/secondary"
-                android:title="Flashcard Stack"
+                android:title="@string/topBarValCourses"
                 app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay"
                 app:title="@string/top_bar_title" />
 

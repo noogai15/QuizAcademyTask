@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.quizacademytask.databinding.FragmentCardBinding
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -16,10 +17,12 @@ class CardFragment : Fragment() {
     private var answer: String? = null
     private var peeking: Boolean = false
 
-
     private lateinit var topicTV: TextView
     private lateinit var textTV: TextView
     private lateinit var cardType: TextView
+
+    private var _binding: FragmentCardBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +43,14 @@ class CardFragment : Fragment() {
         // Inflate the layout for this fragment
         //INITS
 
-        val view: View = inflater.inflate(R.layout.fragment_card, container, false)
+        _binding = FragmentCardBinding.inflate(inflater, container, false)
+
+        val view: View = binding.root
 //        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 //            view = inflater.inflate(R.layout, container, false)
-        topicTV = view.findViewById(R.id.topicTV)
-        textTV = view.findViewById(R.id.textTV)
-        cardType = view.findViewById(R.id.card_type)
+        topicTV = binding.topicTV
+        textTV = binding.textTV
+        cardType = binding.cardTypeTV
 
         topicTV.text = topic
         textTV.text = question
