@@ -19,11 +19,12 @@
             android:layout_height="wrap_content"
             android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay">
 
-            <androidx.appcompat.widget.Toolbar
+            <Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/primary"
+                android:background="@color/secondary"
+                android:title="Flashcard Stack"
                 app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay"
                 app:title="@string/top_bar_title" />
 

@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
+        setActionBar(binding.toolbar)
 
         //INITS
         recyclerView = findViewById(R.id.recyclerView)
@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
         initArrayAdapters()
         recyclerView.adapter = courseAdapter
+        binding.toolbar.title = "Courses"
 
         //SWIPE REFRESH SETTINGS
         swipeContainer.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
@@ -82,8 +83,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             }
             initSwipeDeleteFunction()
         }
-
-
     }
 
     private fun initSwipeDeleteFunction() {
@@ -198,7 +197,11 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
                     )
                     courseJSON = readJSON(file)
                     runOnUiThread(Runnable {
-                        Toast.makeText(this@MainActivity, "Downloaded course", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this@MainActivity,
+                            file.path,
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                         refillStacksList(courseJSON)
                         recyclerView.adapter = stacksAdapter

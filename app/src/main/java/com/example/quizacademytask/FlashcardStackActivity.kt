@@ -1,6 +1,7 @@
 package com.example.quizacademytask
 
 import android.os.Bundle
+import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -10,20 +11,26 @@ class FlashcardStackActivity : FragmentActivity() {
 
     private lateinit var pager: ViewPager2
     private lateinit var stack: CardStack
+    private lateinit var toolbar: Toolbar
     private var NUM_PAGES = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flashcard_stack)
 
+
         // INITS
         stack = intent.getSerializableExtra("stack") as CardStack
         pager = findViewById(R.id.pager)
         NUM_PAGES = stack.num_cards
+        toolbar = findViewById(R.id.toolbar)
+        setActionBar(toolbar)
+        toolbar.title = stack.name
 
         // ADAPTER
         val pagerAdapter = SlidePagerAdapter(this)
         pager.adapter = pagerAdapter
+
 
     }
 

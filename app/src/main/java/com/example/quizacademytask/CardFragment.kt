@@ -17,7 +17,6 @@ class CardFragment : Fragment() {
     private var peeking: Boolean = false
 
 
-    //TODO: Use Question class etc here?
     private lateinit var topicTV: TextView
     private lateinit var textTV: TextView
     private lateinit var cardType: TextView
@@ -30,6 +29,7 @@ class CardFragment : Fragment() {
             question = it.getString("QUESTION")
             answer = it.getString("ANSWER")
         }
+
     }
 
     override fun onCreateView(
@@ -40,7 +40,7 @@ class CardFragment : Fragment() {
         // Inflate the layout for this fragment
         //INITS
 
-        var view: View = inflater.inflate(R.layout.fragment_card, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_card, container, false)
 //        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 //            view = inflater.inflate(R.layout, container, false)
         topicTV = view.findViewById(R.id.topicTV)
@@ -65,5 +65,4 @@ class CardFragment : Fragment() {
         }
         return view
     }
-//Check if device rotated and if so, update the layout accordingly to landscape or portrait
 }

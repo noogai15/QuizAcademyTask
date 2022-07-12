@@ -7,6 +7,21 @@
     android:background="@color/primary"
     tools:context=".FlashcardStackActivity">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay">
+
+        <Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/secondary"
+            android:navigationIcon="@drawable/back_arrow"
+            app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_width="409dp"

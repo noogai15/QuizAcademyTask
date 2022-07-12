@@ -5,9 +5,18 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
 
 class MainActivityTest {
@@ -45,5 +54,20 @@ class MainActivityTest {
             .build();
         val response = client.newCall(request).execute()
         assert(response.isSuccessful)
+    }
+
+
+}
+
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class EspressoTest {
+    //Espresso Test for the MainActivity
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Test
+    fun checkViewExists() {
+        onView(withText("Start Quiz")).check(ViewAssertions.matches(isDisplayed()))
     }
 }
