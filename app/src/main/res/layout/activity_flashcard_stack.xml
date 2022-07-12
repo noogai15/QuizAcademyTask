@@ -26,17 +26,18 @@
             android:title="@string/topBarValCards"
             app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay" />
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/pager"
-            android:layout_width="409dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:background="@color/primary"
-            android:orientation="horizontal">
-
-
-        </androidx.viewpager2.widget.ViewPager2>
     </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="409dp"
+        android:layout_height="0dp"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="56dp">
+
+
+    </androidx.viewpager2.widget.ViewPager2>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
