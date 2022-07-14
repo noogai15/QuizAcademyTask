@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 class SimpleAdapter(
     private val list: ArrayList<String>,
     private val listener: OnItemClickListener,
-    private val name: String
 ) :
     RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
 
@@ -38,10 +37,6 @@ class SimpleAdapter(
     }
 
     override fun getItemCount() = list.size
-
-    fun getList(): ArrayList<String> {
-        return list
-    }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {

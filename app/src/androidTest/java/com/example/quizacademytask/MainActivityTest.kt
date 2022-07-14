@@ -59,15 +59,4 @@ class MainActivityTest {
 
 }
 
-@RunWith(AndroidJUnit4::class)
-@LargeTest
-class EspressoTest {
-    //Espresso Test for the MainActivity
-    @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    @Test
-    fun checkViewExists() {
-        onView(withText("Start Quiz")).check(ViewAssertions.matches(isDisplayed()))
-    }
-}

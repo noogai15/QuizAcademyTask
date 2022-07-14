@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flashcardLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
@@ -14,19 +15,17 @@
         android:layout_marginStart="72dp"
         android:layout_marginTop="133dp"
         android:layout_marginEnd="72dp"
-        android:layout_marginBottom="510dp"
         android:background="@color/white"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
         android:text="@string/topic"
         android:textAlignment="center"
+        android:textColor="@color/primary"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/card_typeTV"
@@ -56,7 +55,9 @@
         android:layout_height="273dp"
         android:layout_marginStart="72dp"
         android:layout_marginEnd="137dp"
+        android:layout_marginBottom="116dp"
         android:background="@color/white"
+        android:gravity="center"
         android:lineSpacingExtra="6sp"
         android:paddingLeft="12dp"
         android:paddingTop="24dp"
@@ -64,12 +65,11 @@
         android:paddingBottom="24dp"
         android:text="@string/text"
         android:textAlignment="center"
+        android:textColor="@color/primary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.228"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.646" />
+        app:layout_constraintHorizontal_bias="0.271"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

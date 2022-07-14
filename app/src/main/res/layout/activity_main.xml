@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipeContainer"
+    android:id="@+id/activity_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:swipeRefreshLayoutProgressSpinnerBackgroundColor="#673AB7">
+    android:background="@color/secondary"
+    tools:context=".MainActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/activity_main_layout"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/secondary"
-        tools:context=".MainActivity">
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay">
-
-            <Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/secondary"
-                android:title="@string/topBarValCourses"
-                app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay"
-                app:title="@string/top_bar_title" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <include
             layout="@layout/content_main"
             android:background="@color/secondary" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay">
+
+        <Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/secondary"
+            android:title="@string/topBarValCourses"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay"
+            app:title="@string/top_bar_title" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

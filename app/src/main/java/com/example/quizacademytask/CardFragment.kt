@@ -46,8 +46,6 @@ class CardFragment : Fragment() {
         _binding = FragmentCardBinding.inflate(inflater, container, false)
 
         val view: View = binding.root
-//        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
-//            view = inflater.inflate(R.layout, container, false)
         topicTV = binding.topicTV
         textTV = binding.textTV
         cardType = binding.cardTypeTV

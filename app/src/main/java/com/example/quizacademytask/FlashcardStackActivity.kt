@@ -20,7 +20,6 @@ class FlashcardStackActivity : FragmentActivity() {
         val binding = ActivityFlashcardStackBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         // INITS
         stack = intent.getSerializableExtra("stack") as CardStack
         pager = binding.pager
