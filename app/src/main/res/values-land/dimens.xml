@@ -1,3 +1,27 @@
 <resources>
     <dimen name="fab_margin">48dp</dimen>
+    <dimen name="typeTV_margin_start">16dp</dimen>
+    <dimen name="typeTV_margin_end">16dp</dimen>
+    <dimen name="topicTV_margin_start">72dp</dimen>
+    <dimen name="topicTV_margin_Top">16dp</dimen>
+    <dimen name="topicTV_margin_End">72dp</dimen>
+    <dimen name="textTV_margin_Start">72dp</dimen>
+    <dimen name="textTV_margin_End">72dp</dimen>
+    <dimen name="textTV_margin_Bottom">12dp</dimen>
+    <dimen name="topicTV_padding_left">24dp</dimen>
+    <dimen name="topicTV_padding_top">12dp</dimen>
+    <dimen name="topicTV_padding_right">24dp</dimen>
+    <dimen name="topicTV_padding_bottom">12dp</dimen>
+    <dimen name="typeTV_padding_start">8dp</dimen>
+    <dimen name="typeTV_padding_top">12dp</dimen>
+    <dimen name="typeTV_padding_bottom">12dp</dimen>
+    <dimen name="textTV_padding_left">12dp</dimen>
+    <dimen name="textTV_padding_top">24dp</dimen>
+    <dimen name="textTV_padding_right">12dp</dimen>
+    <dimen name="textTV_padding_bottom">24dp</dimen>
+    <dimen name="textTV_layout_width">424dp</dimen>
+    <dimen name="typeTV_padding_end">8dp</dimen>
+    <dimen name="textTV_text_size">16sp</dimen>
+    <dimen name="typeTV_text_size">16sp</dimen>
+    <dimen name="topicTV_text_size">16sp</dimen>
 </resources>
