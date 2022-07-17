@@ -16,6 +16,15 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import db.AppDatabase
+import db.dao.CardDAO
+import db.dao.CardStackDAO
+import db.dao.CourseDAO
+import db.entities.Card
+import db.entities.CardStack
+import db.entities.Course
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.*
 
@@ -26,7 +35,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
     }
     private lateinit var swipeContainer: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
-    private lateinit var course: Course
     private lateinit var file: File
     private lateinit var stacksAdapter: SimpleAdapter
     private lateinit var courseList: ArrayList<String>
@@ -34,11 +42,27 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
     private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
     private lateinit var courseJSON: String
     private lateinit var idlingResource: CountingIdlingResource
+    private lateinit var db: AppDatabase
+    private lateinit var courseDAO: CourseDAO
+    private lateinit var cardStackDAO: CardStackDAO
+    private lateinit var cardDAO: CardDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setActionBar(binding.toolbar)
+        this.deleteDatabase("database")
+
+        //DATABASE
+        runBlocking {
+            launch {
+
+                db = AppDatabase.getInstance(this@MainActivity)
+                courseDAO = db.courseDao()
+                cardStackDAO = db.cardStackDAO()
+                cardDAO = db.cardDAO()
+            }
+        }
 
         //INITS
         recyclerView = findViewById(R.id.recyclerView)
@@ -49,9 +73,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         swipeContainer = findViewById(R.id.swipeContainer)
         idlingResource = CountingIdlingResource("API")
 
-        //FILL LISTS
-        courseList.add("BWL Grundlagen")
-
         initArrayAdapters()
         recyclerView.adapter = stacksAdapter
         getRequest()
@@ -60,7 +81,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         //SWIPE REFRESH SETTINGS
         swipeContainer.setOnRefreshListener {
             refillStacksList(courseJSON)
-            stacksAdapter.notifyDataSetChanged()
             swipeContainer.isRefreshing = false
         }
 
@@ -116,9 +136,49 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
     /* Create a Course from JSON */
     private fun createCourse(jsonString: String): Course {
-        val course = Gson().fromJson(jsonString, Course::class.java)
-        this.course = course
-        return course
+        var course: Course? = null
+        runBlocking {
+            launch {
+                val courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
+                val courseRowId = dbEntries(courseObj)
+                course = courseDAO.getById(courseRowId.toInt())
+            }
+        }
+        return course!!
+    }
+
+    private suspend fun dbEntries(courseObj: CourseObject): Long {
+        val courseRowId =
+            courseDAO.insert(
+                Course(
+                    courseObj.id,
+                    courseObj.name,
+                    courseObj.num_cards,
+                    courseObj.num_stacks
+                )
+            )
+        for (stack in courseObj.card_stacks) {
+            cardStackDAO.insert(
+                CardStack(
+                    stack.id,
+                    courseObj.id,
+                    stack.name,
+                    stack.num_cards
+                )
+            )
+            for (card in stack.cards) {
+                cardDAO.insert(
+                    Card(
+                        card.id,
+                        stack.id,
+                        card.answer,
+                        card.explanation,
+                        card.text
+                    )
+                )
+            }
+        }
+        return courseRowId
     }
 
     /* Read JSON from file */
@@ -208,16 +268,23 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
     }
 
     /* Refill the card stacks list */
-    fun refillStacksList(jsonString: String): SimpleAdapter {
+    fun refillStacksList(jsonString: String) {
         stacksList.clear()
-        val course = createCourse(jsonString)
+        runBlocking {
+            launch {
+                val course = createCourse(jsonString)
 
-        for (stack in course.card_stacks) {
-            stacksList.add(stack.name)
-            stackMap[stack.name] = stack
+                val cardStacks: List<CardStack> =
+                    courseDAO.getCourseAndCardStacks(course.courseId)[0].cardStacks
+
+                for (stack in cardStacks) {
+                    stacksList.add(stack.name)
+                    stackMap[stack.name] = stack
+                }
+                stacksAdapter.notifyDataSetChanged()
+                stacksList.sortBy { it } //Alphabetical sort
+            }
         }
-        stacksList.sortBy { it } //Alphabetical sort
-        return stacksAdapter
     }
 
     /* OnClickListener for the course list, navigate to the flashcards if clicked on a card stack */

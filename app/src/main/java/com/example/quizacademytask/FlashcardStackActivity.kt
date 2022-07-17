@@ -7,21 +7,38 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.quizacademytask.databinding.ActivityFlashcardStackBinding
+import db.AppDatabase
+import db.entities.Card
+import db.entities.CardStack
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
 
 class FlashcardStackActivity : FragmentActivity() {
 
+    private val binding: ActivityFlashcardStackBinding by lazy {
+        ActivityFlashcardStackBinding.inflate(layoutInflater)
+    }
     private lateinit var pager: ViewPager2
     private lateinit var stack: CardStack
     private lateinit var toolbar: Toolbar
+    private lateinit var db: AppDatabase
+    private lateinit var cards: List<Card>
     private var NUM_PAGES = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityFlashcardStackBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        //Get Database instance
         // INITS
         stack = intent.getSerializableExtra("stack") as CardStack
+        runBlocking {
+            launch {
+                db = AppDatabase.getInstance(this@FlashcardStackActivity)
+                cards = db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
+            }
+        }
+
         pager = binding.pager
         NUM_PAGES = stack.num_cards
         toolbar = binding.toolbar
@@ -54,8 +71,8 @@ class FlashcardStackActivity : FragmentActivity() {
             frag.apply {
                 arguments = Bundle().apply {
                     putString("TOPIC", stack.name)
-                    putString("QUESTION", stack.cards[position].text)
-                    putString("ANSWER", stack.cards[position].explanation)
+                    putString("QUESTION", cards[position].text)
+                    putString("ANSWER", cards[position].explanation)
                 }
             }
             return frag

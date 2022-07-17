@@ -2,9 +2,9 @@ package com.example.quizacademytask
 
 import java.io.Serializable
 
-data class Course(
+data class CourseObject(
     val available_for_coursemarket: Boolean,
-    val card_stacks: List<CardStack>,
+    val card_stacks: List<CardStackObject>,
     val category: Category,
     val created_at: String,
     val created_by: String,
@@ -30,9 +30,9 @@ data class Course(
     val updated_by: String
 )
 
-data class CardStack(
+data class CardStackObject(
     val active: Boolean,
-    val cards: List<Card>,
+    val cards: List<CardObject>,
     val created_at: String,
     val created_by: String,
     val id: Int,
@@ -65,7 +65,7 @@ data class Quiz(
     val updated_at: String
 )
 
-data class Card(
+data class CardObject(
     val accepted: Boolean,
     val answer: String,
     val created_at: String,

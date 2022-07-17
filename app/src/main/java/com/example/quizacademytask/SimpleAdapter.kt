@@ -19,7 +19,6 @@ class SimpleAdapter(
             R.layout.row_item,
             parent, false
         )
-
         return ViewHolder(itemView)
     }
 
