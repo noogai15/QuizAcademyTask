@@ -23,6 +23,10 @@ interface CourseDAO {
     @Query("SELECT * FROM course WHERE courseId=(:courseId)")
     suspend fun getCourseAndCardStacks(courseId: Int): List<CourseAndCardStacks>
 
+    @Query("SELECT EXISTS(SELECT * FROM course WHERE courseId = :courseId)")
+    suspend fun isExists(courseId: Int): Boolean
+
+
     @Delete
     suspend fun delete(course: Course)
 }

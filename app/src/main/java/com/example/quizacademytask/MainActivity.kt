@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -15,7 +14,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.ActivityMainBinding
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import db.AppDatabase
 import db.dao.CardDAO
 import db.dao.CardStackDAO
@@ -26,16 +24,16 @@ import db.entities.Course
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
-import java.io.*
+import java.io.IOException
 
 class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+    private val courseId = 28
     private lateinit var swipeContainer: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
-    private lateinit var file: File
     private lateinit var stacksAdapter: SimpleAdapter
     private lateinit var courseList: ArrayList<String>
     private lateinit var stacksList: ArrayList<String>
@@ -46,6 +44,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
     private lateinit var courseDAO: CourseDAO
     private lateinit var cardStackDAO: CardStackDAO
     private lateinit var cardDAO: CardDAO
+    private lateinit var courseObj: CourseObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         //DATABASE
         runBlocking {
             launch {
-
                 db = AppDatabase.getInstance(this@MainActivity)
                 courseDAO = db.courseDao()
                 cardStackDAO = db.cardStackDAO()
@@ -75,12 +73,21 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
 
         initArrayAdapters()
         recyclerView.adapter = stacksAdapter
-        getRequest()
-        binding.toolbar.title = "Courses"
 
+        /*Check if course already exists in database. If not then download and insert*/
+        runBlocking {
+            launch {
+                if (!courseDAO.isExists(courseId))
+                    getRequest()
+                else
+                    refillStacksList()
+            }
+        }
+
+        binding.toolbar.title = "Courses"
         //SWIPE REFRESH SETTINGS
         swipeContainer.setOnRefreshListener {
-            refillStacksList(courseJSON)
+            refillStacksList()
             swipeContainer.isRefreshing = false
         }
 
@@ -88,9 +95,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         if (savedInstanceState != null) {
             savedInstanceState.getString("courseJSON")?.let {
                 courseJSON = it
-            }
-            savedInstanceState.getStringArrayList("courseList")?.let {
-                courseList = it
             }
             savedInstanceState.getStringArrayList("stacksList")?.let {
                 stacksList = it
@@ -139,7 +143,7 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         var course: Course? = null
         runBlocking {
             launch {
-                val courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
+                courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
                 val courseRowId = dbEntries(courseObj)
                 course = courseDAO.getById(courseRowId.toInt())
             }
@@ -181,40 +185,10 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         return courseRowId
     }
 
-    /* Read JSON from file */
-    @Throws(JsonSyntaxException::class)
-    fun readJSON(file: File): String {
-        val bReader = BufferedReader(FileReader(file))
-        val content = bReader.readLines()
-        val s: StringBuilder = StringBuilder()
-        for (line in content)
-            if (line.isNotEmpty()) s.append(line)
-        bReader.close()
-        createCourse(s.toString())
-        return s.toString()
-    }
-
-    /* Write JSON file to storage */
-    fun writeJSON(fileName: String, jsonString: String): File {
-        val dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        if (!dir?.exists()!!) dir.mkdir()
-        val file = File(dir.path, "$fileName.json")
-
-        try {
-            val bWriter = BufferedWriter(FileWriter(file))
-            bWriter.write(jsonString)
-            bWriter.close()
-        } catch (e: Exception) {
-            Log.e("JSON", "Error writing JSON")
-        }
-        this.file = file
-        return file
-    }
-
-    /* Send GET request to API and switch adapter to card stacks */
+    /* Send GET request to API*/
     private fun getRequest() {
         EspressoIdlingResource.increment()
-        val url = "https://api.quizacademy.io/quiz-dev/public/courses/28"
+        val url = "https://api.quizacademy.io/quiz-dev/public/courses/$courseId"
         val client = OkHttpClient()
         val ai: ApplicationInfo = applicationContext.packageManager.getApplicationInfo(
             applicationContext.packageName,
@@ -245,20 +219,16 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unsuccessful response")
-                    val json: String? = response.body?.string()
-                    val file = writeJSON(
-                        "BWL_Grundlagen",
-                        json.toString()
-                    )
-                    courseJSON = readJSON(file)
+                    courseJSON = response.body?.string()!!
                     runOnUiThread {
                         Toast.makeText(
                             this@MainActivity,
-                            file.path,
+                            "Course downloaded",
                             Toast.LENGTH_SHORT,
                         )
                             .show()
-                        refillStacksList(courseJSON)
+                        createCourse(courseJSON)
+                        refillStacksList()
                         initSwipeDeleteFunction()
                     }
                 }
@@ -268,14 +238,12 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
     }
 
     /* Refill the card stacks list */
-    fun refillStacksList(jsonString: String) {
+    fun refillStacksList() {
         stacksList.clear()
         runBlocking {
             launch {
-                val course = createCourse(jsonString)
-
                 val cardStacks: List<CardStack> =
-                    courseDAO.getCourseAndCardStacks(course.courseId)[0].cardStacks
+                    courseDAO.getCourseAndCardStacks(courseId)[0].cardStacks
 
                 for (stack in cardStacks) {
                     stacksList.add(stack.name)
@@ -302,7 +270,6 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener {
         outState.putString("courseJSON", courseJSON)
         outState.putBoolean("hasStacksAdapter", recyclerView.adapter == stacksAdapter)
         outState.putStringArrayList("stacksList", stacksList)
-        outState.putStringArrayList("courseList", courseList)
         outState.putSerializable("stackMap", stackMap)
     }
 
