@@ -5,26 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
-    tools:context=".FlashcardStackActivity">
+    tools:context=".FlashcardStackFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+        android:id="@+id/appBarFlashcardStack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbarFlashcardStack"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/secondary"
             android:navigationIcon="@drawable/back_arrow"
             android:title="@string/topBarValCards"
+            app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -39,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+        app:layout_constraintTop_toBottomOf="@+id/appBarFlashcardStack">
 
 
     </androidx.viewpager2.widget.ViewPager2>

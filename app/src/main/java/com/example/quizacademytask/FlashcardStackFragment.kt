@@ -1,12 +1,15 @@
 package com.example.quizacademytask
 
+import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.quizacademytask.databinding.ActivityFlashcardStackBinding
+import com.example.quizacademytask.databinding.FragmentFlashcardStackBinding
 import db.AppDatabase
 import db.entities.Card
 import db.entities.CardStack
@@ -14,57 +17,61 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-class FlashcardStackActivity : FragmentActivity() {
+class FlashcardStackFragment : Fragment() {
 
-    private val binding: ActivityFlashcardStackBinding by lazy {
-        ActivityFlashcardStackBinding.inflate(layoutInflater)
-    }
     private lateinit var pager: ViewPager2
     private lateinit var stack: CardStack
-    private lateinit var toolbar: Toolbar
     private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
+    private lateinit var toolbar: Toolbar
     private var NUM_PAGES = 0
+    private lateinit var appContext: Context
+
+    private var _binding: FragmentFlashcardStackBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        //Get Database instance
+
         // INITS
-        stack = intent.getSerializableExtra("stack") as CardStack
+        appContext = requireContext()
+        arguments?.let {
+            stack = it.getSerializable("stack") as CardStack
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
+
         runBlocking {
             launch {
-                db = AppDatabase.getInstance(this@FlashcardStackActivity)
+                db = AppDatabase.getInstance(appContext)
                 cards = db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
             }
         }
 
+        toolbar = binding.toolbarFlashcardStack
+        requireActivity().setActionBar(toolbar)
         pager = binding.pager
         NUM_PAGES = stack.num_cards
-        toolbar = binding.toolbar
-        setActionBar(toolbar)
-        toolbar.title = stack.name
+        binding.toolbarFlashcardStack.title = stack.name
+
+        toolbar.setNavigationOnClickListener(View.OnClickListener {
+            requireActivity().onBackPressed()
+        })
 
         // ADAPTER
         val pagerAdapter = SlidePagerAdapter(this)
         pager.adapter = pagerAdapter
 
-
+        return binding.root
     }
 
-    override fun onBackPressed() {
-        if (pager.currentItem == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed()
-        } else {
-            // Otherwise, select the previous step.
-            pager.currentItem = pager.currentItem - 1
-        }
-    }
-
-
-    private inner class SlidePagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
+    private inner class SlidePagerAdapter(fa: Fragment) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = NUM_PAGES
         override fun createFragment(position: Int): Fragment {
             val frag = CardFragment()

@@ -8,33 +8,11 @@
     android:background="@color/secondary"
     tools:context=".MainActivity">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <include
-            layout="@layout/content_main"
-            android:background="@color/secondary" />
-
-    </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.QuizAcademyTask.AppBarOverlay">
-
-        <Toolbar
-            android:id="@+id/toolbar"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/secondary"
-            android:title="@string/topBarValCourses"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay"
-            app:title="@string/top_bar_title" />
+            android:layout_height="match_parent" />
 
-    </com.google.android.material.appbar.AppBarLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -32,7 +32,6 @@ class CardFragment : Fragment() {
             question = it.getString("QUESTION")
             answer = it.getString("ANSWER")
         }
-
     }
 
     override fun onCreateView(
