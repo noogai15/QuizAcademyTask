@@ -16,11 +16,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        //Initiate the database
+        //Initiate/Get database instance
         AppDatabase.getInstance(this@MainActivity)
 
-        supportFragmentManager.beginTransaction().add(R.id.fragmentContainer, StackListFragment())
-            .commit()
+        if (savedInstanceState == null) {
+            if (resources.getBoolean(R.bool.isTablet)) {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.fragmentContainer, StackListFragment())
+                    .replace(R.id.fragmentContainer2, FlashcardStackFragment()).commit()
+            } else {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.fragmentContainer, StackListFragment())
+                    .commit()
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.runBlocking
 class FlashcardStackFragment : Fragment() {
 
     private lateinit var pager: ViewPager2
-    private lateinit var stack: CardStack
+    private var stack: CardStack? = null
     private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
     private lateinit var toolbar: Toolbar
@@ -46,23 +46,25 @@ class FlashcardStackFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
+        handleTablet()
+        if (stack == null) return binding.root
 
         runBlocking {
             launch {
                 db = AppDatabase.getInstance(appContext)
-                cards = db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
+                cards = db.cardStackDAO().getCardStackAndCards(stack!!.cardStackId)[0].cards
             }
         }
 
         toolbar = binding.toolbarFlashcardStack
         requireActivity().setActionBar(toolbar)
         pager = binding.pager
-        NUM_PAGES = stack.num_cards
-        binding.toolbarFlashcardStack.title = stack.name
+        NUM_PAGES = stack!!.num_cards
+        binding.toolbarFlashcardStack.title = stack!!.name
 
-        toolbar.setNavigationOnClickListener(View.OnClickListener {
+        toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
-        })
+        }
 
         // ADAPTER
         val pagerAdapter = SlidePagerAdapter(this)
@@ -77,7 +79,7 @@ class FlashcardStackFragment : Fragment() {
             val frag = CardFragment()
             frag.apply {
                 arguments = Bundle().apply {
-                    putString("TOPIC", stack.name)
+                    putString("TOPIC", stack?.name)
                     putString("QUESTION", cards[position].text)
                     putString("ANSWER", cards[position].explanation)
                 }
@@ -85,5 +87,11 @@ class FlashcardStackFragment : Fragment() {
             return frag
         }
 
+    }
+
+    private fun handleTablet() {
+        if (resources.getBoolean(R.bool.isTablet)) {
+            binding.toolbarFlashcardStack.navigationIcon = null
+        }
     }
 }

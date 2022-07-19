@@ -42,10 +42,9 @@ private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseObject
 private lateinit var appContext: Context
+private var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
-    private var param1: String? = null
-    private var param2: String? = null
     private var _binding: FragmentStackListBinding? = null
     private val binding get() = _binding!!
 
@@ -64,6 +63,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         appContext = requireActivity().applicationContext
         recyclerView = binding.recyclerView
         stacksList = ArrayList()
+        isTablet = resources.getBoolean(R.bool.isTablet)
         initArrayAdapters()
         initSwipeDeleteFunction()
         recyclerView.adapter = stacksAdapter
@@ -248,9 +248,10 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         bundle.putSerializable("stack", stack)
         val fragment = FlashcardStackFragment()
         fragment.arguments = bundle
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .addToBackStack(null)
+        val ft = requireActivity().supportFragmentManager.beginTransaction()
+        if (!isTablet) ft.replace(R.id.fragmentContainer, fragment)
+        else ft.replace(R.id.fragmentContainer2, fragment)
+        ft.addToBackStack(null)
             .commit()
     }
 
