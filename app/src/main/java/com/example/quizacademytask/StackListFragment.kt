@@ -123,7 +123,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
-
     /* Create a Course from JSON */
     private fun createCourse(jsonString: String): Course {
         var course: Course? = null
