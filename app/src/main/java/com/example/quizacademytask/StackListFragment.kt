@@ -74,7 +74,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding.toolbarStackList.title = "Topics"
 
         //DATABASE
-        db = AppDatabase.getInstance(appContext)
+        db = AppSingleton.db
         courseDAO = db.courseDao()
         cardStackDAO = db.cardStackDAO()
         cardDAO = db.cardDAO()

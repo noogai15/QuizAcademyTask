@@ -49,7 +49,7 @@ class FlashcardStackFragment : Fragment() {
 
         runBlocking {
             launch {
-                db = AppDatabase.getInstance(appContext)
+                db = AppSingleton.db
                 cards = db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
             }
         }
