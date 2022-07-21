@@ -19,7 +19,7 @@ import kotlinx.coroutines.runBlocking
 class FlashcardStackFragment : Fragment() {
 
     private lateinit var pager: ViewPager2
-    private lateinit var stack: CardStack
+    private var stack: CardStack? = null
     private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
     private lateinit var toolbar: Toolbar
@@ -66,7 +66,7 @@ class FlashcardStackFragment : Fragment() {
         }
 
         // ADAPTER
-        val pagerAdapter = SlidePagerAdapter(this, NUM_PAGES, stack, cards)
+        val pagerAdapter = SlidePagerAdapter(this, NUM_PAGES, stack!!, cards)
         pager.adapter = pagerAdapter
 
         return binding.root
