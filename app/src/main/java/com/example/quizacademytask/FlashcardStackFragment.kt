@@ -23,20 +23,15 @@ class FlashcardStackFragment : Fragment() {
     private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
     private lateinit var toolbar: Toolbar
-    private var NUM_PAGES = 0
+    private var numPages = 0
     private lateinit var appContext: Context
-
-    private lateinit var _binding: FragmentFlashcardStackBinding
-    private val binding get() = _binding
+    private lateinit var binding: FragmentFlashcardStackBinding
+    private lateinit var main: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // INITS
         appContext = requireContext()
-        arguments?.let {
-            stack = it.getSerializable("stack") as CardStack
-        }
+        main = activity as MainActivity
     }
 
     override fun onCreateView(
@@ -44,9 +39,14 @@ class FlashcardStackFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
+        arguments?.let {
+            stack = it.getSerializable("stack") as CardStack
+        }
+        if (main.isTablet()) disableNavBack()
 
-        _binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
-        handleTablet()
+        //If no stack has been clicked yet, leave fragment empty
+        if (stack == null) return binding.root
 
         runBlocking {
             launch {
@@ -55,27 +55,25 @@ class FlashcardStackFragment : Fragment() {
             }
         }
 
+        //INITS
         toolbar = binding.toolbarFlashcardStack
         requireActivity().setActionBar(toolbar)
         pager = binding.pager
-        NUM_PAGES = stack?.let { it.num_cards } ?: 0
+        numPages = stack?.let { it.num_cards } ?: 0
         binding.toolbarFlashcardStack.title = stack!!.name
-
         toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
 
         // ADAPTER
-        val pagerAdapter = SlidePagerAdapter(this, NUM_PAGES, stack!!, cards)
+        val pagerAdapter = SlidePagerAdapter(this, numPages, stack!!, cards)
         pager.adapter = pagerAdapter
 
         return binding.root
     }
 
-
-    private fun handleTablet() {
-        if (resources.getBoolean(R.bool.isTablet)) {
-            binding.toolbarFlashcardStack.navigationIcon = null
-        }
+    private fun disableNavBack() {
+        binding.toolbarFlashcardStack.navigationIcon = null
     }
+
 }

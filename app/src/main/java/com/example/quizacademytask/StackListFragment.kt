@@ -42,11 +42,10 @@ private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseObject
 private lateinit var appContext: Context
+private lateinit var binding: FragmentStackListBinding
 private var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
-    private lateinit var _binding: FragmentStackListBinding
-    private val binding get() = _binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +56,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        _binding = FragmentStackListBinding.inflate(inflater, container, false)
+        binding = FragmentStackListBinding.inflate(inflater, container, false)
 
         //INITS
         appContext = requireActivity().applicationContext
