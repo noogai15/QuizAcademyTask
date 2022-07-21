@@ -91,7 +91,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             }
         }
 
-        //SWIPE REFRESH SETTINGS
+        //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
             getRequest()
             swipeContainer.isRefreshing = false
