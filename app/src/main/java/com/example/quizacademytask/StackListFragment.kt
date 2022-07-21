@@ -45,8 +45,8 @@ private lateinit var appContext: Context
 private var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
-    private var _binding: FragmentStackListBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var _binding: FragmentStackListBinding
+    private val binding get() = _binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
