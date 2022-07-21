@@ -14,7 +14,7 @@ interface CardStackDAO {
     suspend fun getById(id: Long): CardStack
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(cardStack: CardStack)
+    suspend fun insert(cardStack: CardStack): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card): Long

@@ -26,7 +26,11 @@ interface CourseDAO {
     @Query("SELECT EXISTS(SELECT * FROM course WHERE courseId = :courseId)")
     suspend fun isExists(courseId: Int): Boolean
 
-
     @Delete
     suspend fun delete(course: Course)
+
+    @Query("DELETE from course WHERE courseId = :courseId")
+    suspend fun deleteById(courseId: Int)
+
+
 }

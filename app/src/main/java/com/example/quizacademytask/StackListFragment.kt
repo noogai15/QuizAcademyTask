@@ -93,7 +93,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
         //SWIPE REFRESH SETTINGS
         swipeContainer.setOnRefreshListener {
-            refillStacksList()
+            getRequest()
             swipeContainer.isRefreshing = false
         }
 
@@ -125,6 +125,15 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
+    private fun deleteCourse(jsonString: String) {
+        runBlocking {
+            launch {
+                courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
+                courseDAO.deleteById(courseObj.id)
+            }
+        }
+    }
+
     /* Create a Course from JSON */
     private fun createCourse(jsonString: String): Course {
         var course: Course? = null
@@ -152,7 +161,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             cardStackDAO.insert(
                 CardStack(
                     stack.id,
-                    courseObj.id,
+                    courseRowId,
                     stack.name,
                     stack.num_cards
                 )
