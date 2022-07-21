@@ -7,7 +7,7 @@ import java.io.Serializable
 
 @Entity
 data class Course(
-    @PrimaryKey val courseId: Int,
+    @PrimaryKey val courseId: Long,
 //    @ColumnInfo(name = "available") val available_for_coursemarket: Boolean,
 //    @ColumnInfo(name = "card_stacks") val card_stacks: List<CardStack>?,
 //    @ColumnInfo(name = "category") val category: Category?,

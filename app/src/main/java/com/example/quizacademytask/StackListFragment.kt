@@ -21,7 +21,8 @@ import db.AppDatabase
 import db.dao.CardDAO
 import db.dao.CardStackDAO
 import db.dao.CourseDAO
-import db.entities.Card
+import db.dto.toCard
+import db.dto.toCardStack
 import db.entities.CardStack
 import db.entities.Course
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
-private val courseId = 28
+private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
 private lateinit var recyclerView: RecyclerView
 private lateinit var stacksAdapter: SimpleAdapter
@@ -41,7 +42,7 @@ private lateinit var db: AppDatabase
 private lateinit var courseDAO: CourseDAO
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
-private lateinit var courseObj: CourseObject
+private lateinit var courseObj: CourseDTO
 private lateinit var menu: Menu
 private lateinit var appContext: Context
 
@@ -125,57 +126,28 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
-    private fun deleteCourse(jsonString: String) {
-        runBlocking {
-            launch {
-                courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
-                courseDAO.deleteById(courseObj.id)
-            }
-        }
-    }
-
     /* Create a Course from JSON */
     private fun createCourse(jsonString: String): Course {
         var course: Course? = null
         runBlocking {
             launch {
-                courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
+                courseObj = Gson().fromJson(jsonString, CourseDTO::class.java)
                 val courseRowId = dbEntries(courseObj)
-                course = courseDAO.getById(courseRowId.toInt())
+                course = courseDAO.getById(courseRowId)
             }
         }
         return course!!
     }
 
-    private suspend fun dbEntries(courseObj: CourseObject): Long {
-        val courseRowId =
-            courseDAO.insert(
-                Course(
-                    courseObj.id,
-                    courseObj.name,
-                    courseObj.num_cards,
-                    courseObj.num_stacks
-                )
-            )
+
+    private suspend fun dbEntries(courseObj: CourseDTO): Long {
+        val courseRowId = courseDAO.insert(courseObj.toCourse())
+
         for (stack in courseObj.card_stacks) {
-            cardStackDAO.insert(
-                CardStack(
-                    stack.id,
-                    courseRowId,
-                    stack.name,
-                    stack.num_cards
-                )
-            )
+            cardStackDAO.insert(stack.toCardStack(courseRowId))
+
             for (card in stack.cards) {
-                cardDAO.insert(
-                    Card(
-                        card.id,
-                        stack.id,
-                        card.answer,
-                        card.explanation,
-                        card.text
-                    )
-                )
+                cardDAO.insert(card.toCard(stack.id))
             }
         }
         return courseRowId

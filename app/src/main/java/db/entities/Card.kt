@@ -7,8 +7,8 @@ import java.io.Serializable
 
 @Entity
 data class Card(
-    @PrimaryKey val cardId: Int,
-    @ColumnInfo(name = "cardStackId") val cardStackId: Int, //Foreign key to CardStack
+    @PrimaryKey val cardId: Long,
+    @ColumnInfo(name = "cardStackId") val cardStackId: Long, //Foreign key to CardStack
 //    @ColumnInfo(name = "accepted") val accepted: Boolean,
     @ColumnInfo(name = "answer") val answer: String,
 //    @ColumnInfo(name = "created_at") val created_at: String,

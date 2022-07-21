@@ -21,7 +21,7 @@ interface CardStackDAO {
 
     @Transaction
     @Query("SELECT * FROM cardStack WHERE cardStackId=(:stackId)")
-    suspend fun getCardStackAndCards(stackId: Int): List<CardStackAndCards>
+    suspend fun getCardStackAndCards(stackId: Long): List<CardStackAndCards>
 
     @Delete
     suspend fun delete(cardStack: CardStack)
