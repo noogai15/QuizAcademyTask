@@ -21,8 +21,10 @@ import db.AppDatabase
 import db.dao.CardDAO
 import db.dao.CardStackDAO
 import db.dao.CourseDAO
+import db.dto.CourseDTO
 import db.dto.toCard
 import db.dto.toCardStack
+import db.dto.toCourse
 import db.entities.CardStack
 import db.entities.Course
 import kotlinx.coroutines.launch
@@ -77,7 +79,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding.toolbarStackList.title = "Topics"
 
         //DATABASE
-        db = AppSingleton.db
+        db = App.db
         courseDAO = db.courseDao()
         cardStackDAO = db.cardStackDAO()
         cardDAO = db.cardDAO()
@@ -143,7 +145,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     private suspend fun dbEntries(courseObj: CourseDTO): Long {
         val courseRowId = courseDAO.insert(courseObj.toCourse())
 
-        for (stack in courseObj.card_stacks) {
+        for (stack in courseObj.cardStacks) {
             cardStackDAO.insert(stack.toCardStack(courseRowId))
 
             for (card in stack.cards) {

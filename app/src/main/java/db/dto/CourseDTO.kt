@@ -1,37 +1,34 @@
-package com.example.quizacademytask
+package db.dto
 
-import db.dto.CardStackDTO
-import db.dto.CategoryDTO
-import db.dto.OrganizationDTO
-import db.dto.QuizDTO
+import com.google.gson.annotations.SerializedName
 import db.entities.Course
 
 data class CourseDTO(
-    val available_for_coursemarket: Boolean,
-    val card_stacks: List<CardStackDTO>,
-    val categoryDTO: CategoryDTO,
-    val created_at: String,
-    val created_by: String,
+    @SerializedName("available_for_coursemarket") val availableForCoursemarket: Boolean,
+    @SerializedName("card_stacks") val cardStacks: List<CardStackDTO>,
+    val category: CategoryDTO,
+    @SerializedName("create_at") val createdAt: String,
+    @SerializedName("created_by") val createdBy: String,
     val exams: List<Any>,
     val id: Long,
-    val is_active: Boolean,
-    val is_password_protected: Boolean,
-    val is_public: Boolean,
-    val is_user_restricted: Boolean,
-    val is_watched: Boolean,
+    @SerializedName("is_active") val isActive: Boolean,
+    @SerializedName("is_password_protected") val isPasswordProtected: Boolean,
+    @SerializedName("is_public") val isPublic: Boolean,
+    @SerializedName("is_user_restricted") val isUserRestricted: Boolean,
+    @SerializedName("is_watched") val isWatched: Boolean,
     val name: String,
-    val num_cards: Int,
-    val num_questions: Int,
-    val num_quiz: Int,
-    val num_stacks: Int,
-    val organizationDTO: OrganizationDTO,
-    val pin_code: String,
-    val quizDTOS: List<QuizDTO>,
+    @SerializedName("num_cards") val numCards: Int,
+    @SerializedName("num_questions") val numQuestions: Int,
+    @SerializedName("num_quiz") val numQuiz: Int,
+    @SerializedName("num_stacks") val numStacks: Int,
+    val organization: OrganizationDTO,
+    @SerializedName("pin_code") val pinCode: String,
+    val quiz: List<QuizDTO>,
     val responsible: String,
     val score: Int,
     val type: String,
-    val updated_at: String,
-    val updated_by: String
+    @SerializedName("updated_at") val updatedAt: String,
+    @SerializedName("updated_by") val updatedBy: String
 )
 
-fun CourseDTO.toCourse(): Course = Course(id, name, num_cards, num_stacks)
+fun CourseDTO.toCourse(): Course = Course(id, name, numCards, numStacks)

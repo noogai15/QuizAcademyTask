@@ -1,18 +1,19 @@
 package com.example.quizacademytask
 
 import android.app.Application
+import android.content.Context
 import db.AppDatabase
 
-class AppSingleton : Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
         db = AppDatabase.getInstance(this)
+        context = applicationContext
     }
 
     companion object {
-        lateinit var instance: AppSingleton
         lateinit var db: AppDatabase
+        lateinit var context: Context
     }
 }

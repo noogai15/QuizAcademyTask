@@ -1,7 +1,9 @@
 package db.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class AnswerDTO(
     val id: Int,
-    val is_right: Boolean,
+    @SerializedName("is_right")   val isRight: Boolean,
     val text: String
 )
