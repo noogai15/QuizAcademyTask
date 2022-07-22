@@ -16,16 +16,15 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDAO
     abstract fun cardStackDAO(): CardStackDAO
     abstract fun cardDAO(): CardDAO
-
     companion object {
         private var instance: AppDatabase? = null
-
         fun getInstance(context: Context): AppDatabase {
             if (instance == null) {
                 synchronized(AppDatabase::class) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         AppDatabase::class.java,
+
                         "app_database"
                     ).build()
                 }

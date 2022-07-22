@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flashcardLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    tools:context=".CardFragment">
+
+    <TextView
+        android:id="@+id/topicTV"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/topicTV_margin_start"
+        android:layout_marginTop="@dimen/topicTV_margin_Top"
+        android:layout_marginEnd="@dimen/topicTV_margin_End"
+        android:background="@color/white"
+        android:paddingStart="@dimen/topicTV_padding_left"
+        android:paddingTop="@dimen/topicTV_padding_top"
+        android:paddingEnd="@dimen/topicTV_padding_right"
+        android:paddingBottom="@dimen/topicTV_padding_bottom"
+        android:text="@string/topic"
+        android:textAlignment="center"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/topicTV_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/card_typeTV"
+        android:layout_width="315dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/typeTV_margin_start"
+        android:layout_marginEnd="@dimen/typeTV_margin_end"
+        android:background="@color/primary"
+        android:paddingStart="@dimen/typeTV_padding_start"
+        android:paddingTop="@dimen/typeTV_padding_top"
+        android:paddingEnd="@dimen/typeTV_padding_end"
+        android:paddingBottom="@dimen/typeTV_padding_bottom"
+        android:text="@string/card_type"
+        android:textAlignment="viewStart"
+        android:textColor="@color/white"
+        android:textSize="@dimen/typeTV_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topicTV" />
+
+    <TextView
+        android:id="@+id/textTV"
+        android:layout_width="@dimen/textTV_layout_width"
+        android:layout_height="187dp"
+        android:layout_marginStart="@dimen/textTV_margin_Start"
+        android:layout_marginEnd="@dimen/textTV_margin_End"
+        android:layout_marginBottom="@dimen/textTV_margin_Bottom"
+        android:background="@color/white"
+        android:gravity="center"
+        android:lineSpacingExtra="6sp"
+        android:paddingStart="@dimen/textTV_padding_left"
+        android:paddingTop="@dimen/textTV_padding_top"
+        android:paddingEnd="@dimen/textTV_padding_right"
+        android:paddingBottom="@dimen/textTV_padding_bottom"
+        android:text="@string/text"
+        android:textAlignment="center"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/textTV_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

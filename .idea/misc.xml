@@ -6,9 +6,13 @@
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/drawable-anydpi/back_arrow.xml" value="0.206" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-land/flashcard_land.xml" value="0.20282186948853614" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-land/fragment_card.xml" value="0.20282186948853614" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-sw600dp-land/fragment_card.xml" value="0.12682291666666667" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-sw600dp/activity_main.xml" value="0.18125" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-sw600dp/fragment_card.xml" value="0.18125" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-sw600dp/fragment_stack_list.xml" value="0.1" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout-v24/activity_flashcard_stack.xml" value="0.16822916666666668" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/activity_flashcard_stack.xml" value="0.2346014492753623" />
-        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/content_main.xml" value="0.18802083333333333" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/fragment_blank.xml" value="0.19114583333333332" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/fragment_card.xml" value="0.25" />
@@ -17,6 +21,7 @@
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/fragment_flashcards.xml" value="0.18802083333333333" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/fragment_stack_list.xml" value="0.25" />
         <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/layout/row_item.xml" value="0.2848731884057971" />
+        <entry key="..\:/Users/ykohn/AndroidStudioProjects/QuizAcademyTask/app/src/main/res/menu/menu.xml" value="0.2056434373663959" />
       </map>
     </option>
   </component>

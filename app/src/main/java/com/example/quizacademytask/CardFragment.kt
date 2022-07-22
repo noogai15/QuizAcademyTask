@@ -21,8 +21,8 @@ class CardFragment : Fragment() {
     private lateinit var textTV: TextView
     private lateinit var cardType: TextView
 
-    private var _binding: FragmentCardBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var _binding: FragmentCardBinding
+    private val binding get() = _binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
