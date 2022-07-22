@@ -43,7 +43,7 @@ private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseObject
 private lateinit var appContext: Context
 private lateinit var binding: FragmentStackListBinding
-private var isTablet: Boolean = false
+var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 

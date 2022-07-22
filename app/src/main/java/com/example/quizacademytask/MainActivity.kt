@@ -17,10 +17,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         //Initiate/Get database instance
-        AppDatabase.getInstance(this@MainActivity)
+        AppDatabase.getInstance(this)
 
         if (savedInstanceState == null) {
-            if (isTablet()) {
+            if (this.isTablet()) {
                 supportFragmentManager.beginTransaction()
                     .add(R.id.fragmentContainer, StackListFragment())
                     .replace(R.id.fragmentContainer2, FlashcardStackFragment()).commit()
@@ -36,7 +36,4 @@ class MainActivity : AppCompatActivity() {
         super.onBackPressed()
         return true
     }
-
-    fun isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
-
 }
