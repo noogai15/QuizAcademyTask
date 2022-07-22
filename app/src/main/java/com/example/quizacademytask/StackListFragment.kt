@@ -79,10 +79,9 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding.toolbarStackList.title = "Topics"
 
         //DATABASE
-        db = App.db
-        courseDAO = db.courseDao()
-        cardStackDAO = db.cardStackDAO()
-        cardDAO = db.cardDAO()
+        courseDAO = App.db.courseDao()
+        cardStackDAO = App.db.cardStackDAO()
+        cardDAO = App.db.cardDAO()
 
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {

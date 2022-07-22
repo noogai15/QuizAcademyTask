@@ -49,8 +49,7 @@ class FlashcardStackFragment : Fragment() {
 
         runBlocking {
             launch {
-                db = App.db
-                cards = db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
+                cards = App.db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
             }
         }
 
