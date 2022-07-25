@@ -11,7 +11,7 @@ interface CourseDAO {
     suspend fun getAll(): List<Course>
 
     @Query("SELECT * FROM course WHERE courseId=(:id)")
-    suspend fun getById(id: Int): Course
+    suspend fun getById(id: Long): Course
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(course: Course): Long
@@ -21,12 +21,15 @@ interface CourseDAO {
 
     @Transaction
     @Query("SELECT * FROM course WHERE courseId=(:courseId)")
-    suspend fun getCourseAndCardStacks(courseId: Int): List<CourseAndCardStacks>
+    suspend fun getCourseAndCardStacks(courseId: Long): List<CourseAndCardStacks>
 
     @Query("SELECT EXISTS(SELECT * FROM course WHERE courseId = :courseId)")
-    suspend fun isExists(courseId: Int): Boolean
-
+    suspend fun isExists(courseId: Long): Boolean
 
     @Delete
     suspend fun delete(course: Course)
+
+    @Query("DELETE from course WHERE courseId = :courseId")
+    suspend fun deleteById(courseId: Long)
+
 }

@@ -8,9 +8,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.quizacademytask.databinding.FragmentCardBinding
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 class CardFragment : Fragment() {
     private var topic: String? = null
     private var question: String? = null

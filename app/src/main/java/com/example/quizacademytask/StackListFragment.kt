@@ -15,12 +15,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
+import com.example.quizacademytask.dto.CourseDTO
+import com.example.quizacademytask.dto.toCard
+import com.example.quizacademytask.dto.toCardStack
+import com.example.quizacademytask.dto.toCourse
 import com.google.gson.Gson
-import db.AppDatabase
 import db.dao.CardDAO
 import db.dao.CardStackDAO
 import db.dao.CourseDAO
-import db.entities.Card
 import db.entities.CardStack
 import db.entities.Course
 import kotlinx.coroutines.launch
@@ -28,7 +30,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
-private val courseId = 28
+private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
 private lateinit var recyclerView: RecyclerView
 private lateinit var stacksAdapter: SimpleAdapter
@@ -36,20 +38,15 @@ private lateinit var stacksList: ArrayList<String>
 private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
 private lateinit var courseJSON: String
 private lateinit var idlingResource: CountingIdlingResource
-private lateinit var db: AppDatabase
 private lateinit var courseDAO: CourseDAO
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
-private lateinit var courseObj: CourseObject
+private lateinit var courseObj: CourseDTO
 private lateinit var appContext: Context
 private lateinit var binding: FragmentStackListBinding
 var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,10 +70,9 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding.toolbarStackList.title = "Topics"
 
         //DATABASE
-        db = AppDatabase.getInstance(appContext)
-        courseDAO = db.courseDao()
-        cardStackDAO = db.cardStackDAO()
-        cardDAO = db.cardDAO()
+        courseDAO = App.db.courseDao()
+        cardStackDAO = App.db.cardStackDAO()
+        cardDAO = App.db.cardDAO()
 
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {
@@ -88,9 +84,9 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             }
         }
 
-        //SWIPE REFRESH SETTINGS
+        //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
-            refillStacksList()
+            getRequest()
             swipeContainer.isRefreshing = false
         }
 
@@ -122,49 +118,32 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
-
     /* Create a Course from JSON */
     private fun createCourse(jsonString: String): Course {
         var course: Course? = null
         runBlocking {
             launch {
-                courseObj = Gson().fromJson(jsonString, CourseObject::class.java)
+                courseObj = gsonParse(jsonString)
                 val courseRowId = dbEntries(courseObj)
-                course = courseDAO.getById(courseRowId.toInt())
+                course = courseDAO.getById(courseRowId)
             }
         }
         return course!!
     }
 
-    private suspend fun dbEntries(courseObj: CourseObject): Long {
-        val courseRowId =
-            courseDAO.insert(
-                Course(
-                    courseObj.id,
-                    courseObj.name,
-                    courseObj.num_cards,
-                    courseObj.num_stacks
-                )
-            )
-        for (stack in courseObj.card_stacks) {
-            cardStackDAO.insert(
-                CardStack(
-                    stack.id,
-                    courseObj.id,
-                    stack.name,
-                    stack.num_cards
-                )
-            )
+    /* Create a DTO from JSON */
+    private fun gsonParse(jsonString: String): CourseDTO {
+        return Gson().fromJson(jsonString, CourseDTO::class.java)
+    }
+
+    private suspend fun dbEntries(courseObj: CourseDTO): Long {
+        val courseRowId = courseDAO.insert(courseObj.toCourse())
+
+        for (stack in courseObj.cardStacks) {
+            cardStackDAO.insert(stack.toCardStack(courseRowId))
+
             for (card in stack.cards) {
-                cardDAO.insert(
-                    Card(
-                        card.id,
-                        stack.id,
-                        card.answer,
-                        card.explanation,
-                        card.text
-                    )
-                )
+                cardDAO.insert(card.toCard(stack.id))
             }
         }
         return courseRowId

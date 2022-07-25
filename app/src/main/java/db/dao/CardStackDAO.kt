@@ -14,14 +14,14 @@ interface CardStackDAO {
     suspend fun getById(id: Long): CardStack
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(cardStack: CardStack)
+    suspend fun insert(cardStack: CardStack): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card): Long
 
     @Transaction
     @Query("SELECT * FROM cardStack WHERE cardStackId=(:stackId)")
-    suspend fun getCardStackAndCards(stackId: Int): List<CardStackAndCards>
+    suspend fun getCardStackAndCards(stackId: Long): List<CardStackAndCards>
 
     @Delete
     suspend fun delete(cardStack: CardStack)

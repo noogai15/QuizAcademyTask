@@ -9,7 +9,7 @@ interface CardDAO {
     suspend fun getAll(): List<Card>
 
     @Query("SELECT * FROM card WHERE cardId = :id")
-    suspend fun getById(id: Int): Card
+    suspend fun getById(id: Long): Card
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(card: Card)
