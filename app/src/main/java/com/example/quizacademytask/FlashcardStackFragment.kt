@@ -4,10 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+
+
 import android.view.ViewGroup
 import android.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.quizacademytask.databinding.FragmentFlashcardStackBinding
 import db.AppDatabase
@@ -16,24 +17,19 @@ import db.entities.CardStack
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-
 class FlashcardStackFragment : Fragment() {
 
     private lateinit var pager: ViewPager2
-    private lateinit var stack: CardStack
+    private var stack: CardStack? = null
     private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
     private lateinit var toolbar: Toolbar
-    private var NUM_PAGES = 0
+    private var numPages = 0
     private lateinit var appContext: Context
-
-    private var _binding: FragmentFlashcardStackBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentFlashcardStackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // INITS
         appContext = requireContext()
         arguments?.let {
             stack = it.getSerializable("stack") as CardStack
@@ -45,44 +41,42 @@ class FlashcardStackFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
+        binding = FragmentFlashcardStackBinding.inflate(inflater, container, false)
+
+        //Set the toolbar
+        toolbar = binding.toolbarFlashcardStack
+        requireActivity().setActionBar(toolbar)
+        toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
+
+        if (appContext.isTablet()) {
+            toolbar.disableNavBack()
+        }
+
+        //If no stack has been clicked yet, leave the rest of the fragment empty
+        if (stack == null) return binding.root
+
+        //INITS
+        pager = binding.pager
+        numPages = stack?.let { it.num_cards } ?: 0
+        toolbar.title = stack!!.name
+
 
         runBlocking {
             launch {
                 cards = App.db.cardStackDAO().getCardStackAndCards(stack.cardStackId)[0].cards
+                db = AppDatabase.getInstance(appContext)
             }
         }
 
-        toolbar = binding.toolbarFlashcardStack
-        requireActivity().setActionBar(toolbar)
-        pager = binding.pager
-        NUM_PAGES = stack.num_cards
-        binding.toolbarFlashcardStack.title = stack.name
-
-        toolbar.setNavigationOnClickListener(View.OnClickListener {
-            requireActivity().onBackPressed()
-        })
 
         // ADAPTER
-        val pagerAdapter = SlidePagerAdapter(this)
+        val pagerAdapter = SlidePagerAdapter(this, numPages, stack!!, cards)
         pager.adapter = pagerAdapter
 
         return binding.root
     }
 
-    private inner class SlidePagerAdapter(fa: Fragment) : FragmentStateAdapter(fa) {
-        override fun getItemCount(): Int = NUM_PAGES
-        override fun createFragment(position: Int): Fragment {
-            val frag = CardFragment()
-            frag.apply {
-                arguments = Bundle().apply {
-                    putString("TOPIC", stack.name)
-                    putString("QUESTION", cards[position].text)
-                    putString("ANSWER", cards[position].explanation)
-                }
-            }
-            return frag
-        }
 
-    }
 }
+
+
