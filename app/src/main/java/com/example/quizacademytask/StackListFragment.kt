@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -16,15 +15,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
+import com.example.quizacademytask.dto.CourseDTO
+import com.example.quizacademytask.dto.toCard
+import com.example.quizacademytask.dto.toCardStack
+import com.example.quizacademytask.dto.toCourse
 import com.google.gson.Gson
-import db.AppDatabase
 import db.dao.CardDAO
 import db.dao.CardStackDAO
 import db.dao.CourseDAO
-import db.dto.CourseDTO
-import db.dto.toCard
-import db.dto.toCardStack
-import db.dto.toCourse
 import db.entities.CardStack
 import db.entities.Course
 import kotlinx.coroutines.launch
@@ -40,21 +38,15 @@ private lateinit var stacksList: ArrayList<String>
 private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
 private lateinit var courseJSON: String
 private lateinit var idlingResource: CountingIdlingResource
-private lateinit var db: AppDatabase
 private lateinit var courseDAO: CourseDAO
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseDTO
-private lateinit var menu: Menu
 private lateinit var appContext: Context
 private lateinit var binding: FragmentStackListBinding
 var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,7 +123,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         var course: Course? = null
         runBlocking {
             launch {
-                courseObj = Gson().fromJson(jsonString, CourseDTO::class.java)
+                courseObj = gsonParse(jsonString)
                 val courseRowId = dbEntries(courseObj)
                 course = courseDAO.getById(courseRowId)
             }
@@ -139,6 +131,10 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         return course!!
     }
 
+    /* Create a DTO from JSON */
+    private fun gsonParse(jsonString: String): CourseDTO {
+        return Gson().fromJson(jsonString, CourseDTO::class.java)
+    }
 
     private suspend fun dbEntries(courseObj: CourseDTO): Long {
         val courseRowId = courseDAO.insert(courseObj.toCourse())

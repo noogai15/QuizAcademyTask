@@ -9,7 +9,6 @@ import java.io.Serializable
 @Entity
 data class Question(
     @PrimaryKey val id: Int,
-//    @ColumnInfo(name = "answers") val answers: List<Answer>,
     @ColumnInfo(name = "created_at") val created_at: String,
     @ColumnInfo(name = "created_by") val created_by: String,
     @ColumnInfo(name = "explanation") val explanation: String,

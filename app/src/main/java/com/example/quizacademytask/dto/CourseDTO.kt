@@ -1,4 +1,4 @@
-package db.dto
+package com.example.quizacademytask.dto
 
 import com.google.gson.annotations.SerializedName
 import db.entities.Course

@@ -1,4 +1,4 @@
-package db.dto
+package com.example.quizacademytask.dto
 
 data class CategoryDTO(
     val id: Int,

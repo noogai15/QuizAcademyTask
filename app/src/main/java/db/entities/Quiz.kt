@@ -13,7 +13,6 @@ data class Quiz(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "num_questions") val num_questions: Int,
     @ColumnInfo(name = "position") val position: Int,
-//    @ColumnInfo(name = "questions") val questions: List<Question>,
     @ColumnInfo(name = "updated_at") val updated_at: String
 )
 
