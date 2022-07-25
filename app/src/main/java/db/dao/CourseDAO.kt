@@ -32,5 +32,4 @@ interface CourseDAO {
     @Query("DELETE from course WHERE courseId = :courseId")
     suspend fun deleteById(courseId: Long)
 
-
 }

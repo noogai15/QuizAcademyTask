@@ -4,14 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-
-
 import android.view.ViewGroup
 import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.quizacademytask.databinding.FragmentFlashcardStackBinding
-import db.AppDatabase
 import db.entities.Card
 import db.entities.CardStack
 import kotlinx.coroutines.launch
@@ -21,7 +18,6 @@ class FlashcardStackFragment : Fragment() {
 
     private lateinit var pager: ViewPager2
     private var stack: CardStack? = null
-    private lateinit var db: AppDatabase
     private lateinit var cards: List<Card>
     private lateinit var toolbar: Toolbar
     private var numPages = 0
@@ -64,7 +60,6 @@ class FlashcardStackFragment : Fragment() {
         runBlocking {
             launch {
                 cards = App.db.cardStackDAO().getCardStackAndCards(stack!!.cardStackId)[0].cards
-                db = AppDatabase.getInstance(appContext)
             }
         }
 
