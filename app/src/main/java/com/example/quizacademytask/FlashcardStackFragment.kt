@@ -45,14 +45,17 @@ class FlashcardStackFragment : Fragment() {
 
         //Set the toolbar
         toolbar = binding.toolbarFlashcardStack
-        if (appContext.isTablet()) toolbar.disableNavBack()
-        else toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
+        requireActivity().setActionBar(toolbar)
+        toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
+
+        if (appContext.isTablet()) {
+            toolbar.disableNavBack()
+        }
 
         //If no stack has been clicked yet, leave the rest of the fragment empty
         if (stack == null) return binding.root
 
         //INITS
-        requireActivity().setActionBar(toolbar)
         pager = binding.pager
         numPages = stack?.let { it.num_cards } ?: 0
         toolbar.title = stack!!.name
