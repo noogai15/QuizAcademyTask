@@ -15,4 +15,3 @@ data class Quiz(
     @ColumnInfo(name = "position") val position: Int,
     @ColumnInfo(name = "updated_at") val updated_at: String
 )
-

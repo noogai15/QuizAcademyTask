@@ -23,4 +23,3 @@ data class Question(
     @ColumnInfo(name = "updated_by") val updated_by: String,
     @ColumnInfo(name = "weblink") val weblink: String
 ) : Serializable
-

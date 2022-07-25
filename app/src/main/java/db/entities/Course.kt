@@ -12,7 +12,3 @@ data class Course(
     @ColumnInfo(name = "num_cards") val num_cards: Int?,
     @ColumnInfo(name = "num_stacks") val num_stacks: Int?,
 ) : Serializable
-
-
-
-

@@ -13,4 +13,3 @@ data class Card(
     @ColumnInfo(name = "explanation") val explanation: String,
     @ColumnInfo(name = "text") val text: String,
 ) : Serializable
-

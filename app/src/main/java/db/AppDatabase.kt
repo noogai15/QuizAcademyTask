@@ -16,6 +16,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDAO
     abstract fun cardStackDAO(): CardStackDAO
     abstract fun cardDAO(): CardDAO
+
     companion object {
         private var instance: AppDatabase? = null
         fun getInstance(context: Context): AppDatabase {
