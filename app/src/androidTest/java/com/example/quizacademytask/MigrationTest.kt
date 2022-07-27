@@ -28,16 +28,28 @@ class MigrationTest {
         }
         testHelper.runMigrationsAndValidate(testDBName, 2, true, AppDatabase.MIGRATION_1_2)
 
-        val resultCursor = db.query("SELECT * FROM CardStack")
-        resultCursor.moveToFirst()
+        val stackCursor = db.query("SELECT * FROM CardStack")
+        val cardCursor = db.query("SELECT * FROM Card")
+        stackCursor.moveToFirst()
+        cardCursor.moveToFirst()
 
-        val id = resultCursor.getInt(0)
-        val name = resultCursor.getString(1)
-        val numCards = resultCursor.getInt(2)
+        val stackId = stackCursor.getInt(0)
+        val stackName = stackCursor.getString(1)
+        val stackNumCards = stackCursor.getInt(2)
+        val cardId = cardCursor.getInt(0)
+        val cardFK = cardCursor.getInt(1)
+        val cardAnswer = cardCursor.getString(2)
+        val cardExplanation = cardCursor.getString(3)
+        val cardText = cardCursor.getString(4)
 
-        assertEquals(1, id)
-        assertEquals("testStack", name)
-        assertEquals(4, numCards)
+        assertEquals(0, stackId)
+        assertEquals("testStack", stackName)
+        assertEquals(4, stackNumCards)
+        assertEquals(0, cardId)
+        assertEquals(0, cardFK)
+        assertEquals("testAnswer", cardAnswer)
+        assertEquals("testExplanation", cardExplanation)
+        assertEquals("testText", cardText)
 
         db.close()
     }

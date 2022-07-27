@@ -21,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
         private var instance: AppDatabase? = null
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                //CardStack Migration
                 database.execSQL("ALTER TABLE CardStack RENAME TO CardStackOLD")
                 database.execSQL(
                     "CREATE TABLE CardStack(" +
@@ -28,9 +29,25 @@ abstract class AppDatabase : RoomDatabase() {
                             "name TEXT NOT NULL," +
                             "num_cards INTEGER NOT NULL) "
                 )
-                database.execSQL("INSERT INTO CardStack(name, num_cards) SELECT name, num_cards FROM cardStackOLD")
-                database.execSQL("DROP TABLE CardStackOLD")
+                database.execSQL("INSERT INTO CardStack(cardStackId, name, num_cards) SELECT cardStackId, name, num_cards FROM CardStackOLD")
+
+                //Card Migration
+                database.execSQL("ALTER TABLE Card RENAME TO CardOLD")
+                database.execSQL(
+                    "CREATE TABLE Card(" +
+                            "cardId INTEGER NOT NULL PRIMARY KEY," +
+                            "cardStackId INTEGER NOT NULL," +
+                            "answer TEXT NOT NULL," +
+                            "explanation TEXT NOT NULL," +
+                            "text TEXT NOT NULL," +
+                            "FOREIGN KEY (cardStackId) REFERENCES CardStack(cardStackId) ON UPDATE CASCADE ON DELETE CASCADE) "
+                )
+                database.execSQL("INSERT INTO Card(cardId, cardStackId, answer, explanation, text) SELECT cardId, cardStackId, answer, explanation, text FROM CardOLD")
+
+                //Delete old tables
                 database.execSQL("DROP TABLE Course")
+                database.execSQL("DROP TABLE CardStackOLD")
+                database.execSQL("DROP TABLE CardOLD")
             }
         }
 
