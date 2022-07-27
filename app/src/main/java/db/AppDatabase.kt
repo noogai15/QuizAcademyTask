@@ -22,6 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 //CardStack Migration
+                database.execSQL("BEGIN TRANSACTION")
+
                 database.execSQL("ALTER TABLE CardStack RENAME TO CardStackOLD")
                 database.execSQL(
                     "CREATE TABLE CardStack(" +
@@ -30,6 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "num_cards INTEGER NOT NULL) "
                 )
                 database.execSQL("INSERT INTO CardStack(cardStackId, name, num_cards) SELECT cardStackId, name, num_cards FROM CardStackOLD")
+                database.execSQL("COMMIT")
 
                 //Card Migration
                 database.execSQL("ALTER TABLE Card RENAME TO CardOLD")

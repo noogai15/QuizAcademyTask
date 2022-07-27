@@ -7,6 +7,7 @@ import db.AppDatabase
 import junit.framework.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
 class MigrationTest {
     private val testDBName = "test_db"
@@ -42,6 +43,8 @@ class MigrationTest {
         val cardExplanation = cardCursor.getString(3)
         val cardText = cardCursor.getString(4)
 
+        //Assert that Course table got dropped
+        assertFailsWith<Exception> { assertEquals(0, db.query("SELECT * FROM Course")) }
         assertEquals(0, stackId)
         assertEquals("testStack", stackName)
         assertEquals(4, stackNumCards)
@@ -53,6 +56,5 @@ class MigrationTest {
 
         db.close()
     }
-
 
 }
