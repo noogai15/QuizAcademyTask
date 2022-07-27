@@ -1,7 +1,6 @@
 package com.example.quizacademytask.dto
 
 import com.google.gson.annotations.SerializedName
-import db.entities.Course
 
 data class CourseDTO(
     @SerializedName("available_for_coursemarket") val availableForCoursemarket: Boolean,
@@ -30,5 +29,3 @@ data class CourseDTO(
     @SerializedName("updated_at") val updatedAt: String,
     @SerializedName("updated_by") val updatedBy: String
 )
-
-fun CourseDTO.toCourse(): Course = Course(id, name, numCards, numStacks)

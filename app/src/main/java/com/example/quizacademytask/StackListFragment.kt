@@ -18,13 +18,10 @@ import com.example.quizacademytask.databinding.FragmentStackListBinding
 import com.example.quizacademytask.dto.CourseDTO
 import com.example.quizacademytask.dto.toCard
 import com.example.quizacademytask.dto.toCardStack
-import com.example.quizacademytask.dto.toCourse
 import com.google.gson.Gson
 import db.dao.CardDAO
 import db.dao.CardStackDAO
-import db.dao.CourseDAO
 import db.entities.CardStack
-import db.entities.Course
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
@@ -38,7 +35,6 @@ private lateinit var stacksList: ArrayList<String>
 private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
 private lateinit var courseJSON: String
 private lateinit var idlingResource: CountingIdlingResource
-private lateinit var courseDAO: CourseDAO
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseDTO
@@ -76,7 +72,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {
             launch {
-                if (!courseDAO.isExists(courseId))
+                if (cardStackDAO.getAll().isEmpty())
                     getRequest()
                 else
                     refillStacksList()
@@ -118,16 +114,15 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     }
 
     /* Create a Course from JSON */
-    private fun createCourse(jsonString: String): Course {
-        var course: Course? = null
+    private fun createCourse(jsonString: String): List<CardStack>? {
+        var cardStacks: List<CardStack>? = null
         runBlocking {
             launch {
                 courseObj = gsonParse(jsonString)
-                val courseRowId = dbEntries(courseObj)
-                course = courseDAO.getById(courseRowId)
+                cardStacks = dbEntries(courseObj)
             }
         }
-        return course!!
+        return cardStacks
     }
 
     /* Create a DTO from JSON */
@@ -135,17 +130,14 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         return Gson().fromJson(jsonString, CourseDTO::class.java)
     }
 
-    private suspend fun dbEntries(courseObj: CourseDTO): Long {
-        val courseRowId = courseDAO.insert(courseObj.toCourse())
-
+    private suspend fun dbEntries(courseObj: CourseDTO): List<CardStack> {
         for (stack in courseObj.cardStacks) {
-            cardStackDAO.insert(stack.toCardStack(courseRowId))
-
+            cardStackDAO.insert(stack.toCardStack())
             for (card in stack.cards) {
                 cardDAO.insert(card.toCard(stack.id))
             }
         }
-        return courseRowId
+        return cardStackDAO.getAll()
     }
 
     /* Send GET request to API*/
@@ -205,9 +197,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksList.clear()
         runBlocking {
             launch {
-                val cardStacks: List<CardStack> =
-                    courseDAO.getCourseAndCardStacks(courseId)[0].cardStacks
-
+                val cardStacks: List<CardStack> = cardStackDAO.getAll()
                 for (stack in cardStacks) {
                     stacksList.add(stack.name)
                     stackMap[stack.name] = stack
