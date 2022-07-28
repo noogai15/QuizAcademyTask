@@ -19,7 +19,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbarStackList"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -28,7 +28,7 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay">
 
-            </Toolbar>
+            </androidx.appcompat.widget.Toolbar>
 
 
         </com.google.android.material.appbar.AppBarLayout>

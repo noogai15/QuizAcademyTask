@@ -5,10 +5,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -30,23 +29,25 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
-private val courseId: Long = 28
-private lateinit var swipeContainer: SwipeRefreshLayout
-private lateinit var recyclerView: RecyclerView
-private lateinit var stacksAdapter: SimpleAdapter
-private lateinit var stacksList: ArrayList<String>
-private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
-private lateinit var courseJSON: String
-private lateinit var idlingResource: CountingIdlingResource
-private lateinit var courseDAO: CourseDAO
-private lateinit var cardStackDAO: CardStackDAO
-private lateinit var cardDAO: CardDAO
-private lateinit var courseObj: CourseDTO
-private lateinit var appContext: Context
-private lateinit var binding: FragmentStackListBinding
-var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
+
+    private val courseId: Long = 28
+    private lateinit var swipeContainer: SwipeRefreshLayout
+    private lateinit var toolbar: Toolbar
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var stacksAdapter: SimpleAdapter
+    private lateinit var stacksList: ArrayList<String>
+    private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
+    private lateinit var courseJSON: String
+    private lateinit var idlingResource: CountingIdlingResource
+    private lateinit var courseDAO: CourseDAO
+    private lateinit var cardStackDAO: CardStackDAO
+    private lateinit var cardDAO: CardDAO
+    private lateinit var courseObj: CourseDTO
+    private lateinit var appContext: Context
+    private lateinit var binding: FragmentStackListBinding
+    var isTablet: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,9 +55,11 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     ): View? {
 
         binding = FragmentStackListBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
 
         //INITS
         appContext = requireActivity().applicationContext
+        toolbar = binding.toolbarStackList
         recyclerView = binding.recyclerView
         stacksList = ArrayList()
         isTablet = resources.getBoolean(R.bool.isTablet)
@@ -67,7 +70,13 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         courseJSON = ""
         swipeContainer = binding.swipeContainer
         idlingResource = CountingIdlingResource("API")
+
+        //Set the toolbar
         binding.toolbarStackList.title = "Topics"
+        (activity as MainActivity).setSupportActionBar(toolbar)
+        toolbar.setOnClickListener(View.OnClickListener {
+        })
+
 
         //DATABASE
         courseDAO = App.db.courseDao()
@@ -231,6 +240,16 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         else ft.replace(R.id.fragmentContainer2, fragment)
         ft.addToBackStack(null)
             .commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+        return super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.updateButton) getRequest()
+        return false
     }
 
 }

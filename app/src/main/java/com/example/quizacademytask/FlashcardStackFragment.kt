@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.quizacademytask.databinding.FragmentFlashcardStackBinding
@@ -41,7 +41,6 @@ class FlashcardStackFragment : Fragment() {
 
         //Set the toolbar
         toolbar = binding.toolbarFlashcardStack
-        requireActivity().setActionBar(toolbar)
         toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
 
         if (appContext.isTablet()) {
@@ -62,7 +61,6 @@ class FlashcardStackFragment : Fragment() {
                 cards = App.db.cardStackDAO().getCardStackAndCards(stack!!.cardStackId)[0].cards
             }
         }
-
 
         // ADAPTER
         val pagerAdapter = SlidePagerAdapter(this, numPages, stack!!, cards)
