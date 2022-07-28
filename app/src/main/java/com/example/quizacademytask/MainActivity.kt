@@ -1,7 +1,6 @@
 package com.example.quizacademytask
 
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quizacademytask.databinding.ActivityMainBinding
 import db.AppDatabase
@@ -30,10 +29,5 @@ class MainActivity : AppCompatActivity() {
                     .commit()
             }
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        super.onBackPressed()
-        return true
     }
 }
