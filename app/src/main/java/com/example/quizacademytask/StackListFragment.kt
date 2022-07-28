@@ -113,8 +113,8 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
-    /* Create a Course from JSON */
-    private fun createCourse(jsonString: String): List<CardStack>? {
+    /* Create a CardStack's from JSON */
+    private fun createStacks(jsonString: String): List<CardStack>? {
         var cardStacks: List<CardStack>? = null
         runBlocking {
             launch {
@@ -182,7 +182,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                             Toast.LENGTH_SHORT,
                         )
                             .show()
-                        createCourse(courseJSON)
+                        createStacks(courseJSON)
                         refillStacksList()
                         initSwipeDeleteFunction()
                     }
