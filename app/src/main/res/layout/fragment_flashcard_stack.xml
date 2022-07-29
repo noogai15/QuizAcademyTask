@@ -21,9 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/secondary"
-            android:navigationIcon="@drawable/back_arrow"
             android:title="@string/topBarValCards"
             app:layout_scrollFlags="scroll|enterAlways"
+            app:navigationIcon="@drawable/back_arrow"
             app:popupTheme="@style/Theme.QuizAcademyTask.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>

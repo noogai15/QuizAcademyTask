@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -32,7 +33,10 @@ import java.io.IOException
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
-    private val courseId: Long = 28
+    companion object {
+        private const val COURSE_ID: Long = 28
+    }
+
     private lateinit var swipeContainer: SwipeRefreshLayout
     private lateinit var toolbar: Toolbar
     private lateinit var recyclerView: RecyclerView
@@ -73,10 +77,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
         //Set the toolbar
         binding.toolbarStackList.title = "Topics"
-        (activity as MainActivity).setSupportActionBar(toolbar)
-        toolbar.setOnClickListener(View.OnClickListener {
-        })
-
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         //DATABASE
         courseDAO = App.db.courseDao()
@@ -86,7 +87,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {
             launch {
-                if (!courseDAO.isExists(courseId))
+                if (!courseDAO.isExists(COURSE_ID))
                     getRequest()
                 else
                     refillStacksList()
@@ -161,7 +162,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     /* Send GET request to API*/
     private fun getRequest() {
         EspressoIdlingResource.increment()
-        val url = "https://api.quizacademy.io/quiz-dev/public/courses/$courseId"
+        val url = "https://api.quizacademy.io/quiz-dev/public/courses/$COURSE_ID"
         val client = OkHttpClient()
         val ai: ApplicationInfo = appContext.packageManager.getApplicationInfo(
             appContext.packageName,
@@ -216,7 +217,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         runBlocking {
             launch {
                 val cardStacks: List<CardStack> =
-                    courseDAO.getCourseAndCardStacks(courseId)[0].cardStacks
+                    courseDAO.getCourseAndCardStacks(COURSE_ID)[0].cardStacks
 
                 for (stack in cardStacks) {
                     stacksList.add(stack.name)
@@ -243,7 +244,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
+        inflater.inflate(R.menu.stacks_update_action, menu)
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
