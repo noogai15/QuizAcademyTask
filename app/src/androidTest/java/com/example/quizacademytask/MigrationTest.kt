@@ -45,9 +45,13 @@ class MigrationTest {
 
         //Assert that Course table got dropped
         assertFailsWith<Exception> { assertEquals(0, db.query("SELECT * FROM Course")) }
+
+        //Assert that CardStack got migrated
         assertEquals(0, stackId)
         assertEquals("testStack", stackName)
         assertEquals(4, stackNumCards)
+
+        //Assert that Card got migrated
         assertEquals(0, cardId)
         assertEquals(0, cardFK)
         assertEquals("testAnswer", cardAnswer)

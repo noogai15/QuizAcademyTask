@@ -23,7 +23,6 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 //CardStack Migration
                 database.execSQL("BEGIN TRANSACTION")
-
                 database.execSQL("ALTER TABLE CardStack RENAME TO CardStackOLD")
                 database.execSQL(
                     "CREATE TABLE CardStack(" +
@@ -35,6 +34,7 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL("COMMIT")
 
                 //Card Migration
+                database.execSQL("BEGIN TRANSACTION")
                 database.execSQL("ALTER TABLE Card RENAME TO CardOLD")
                 database.execSQL(
                     "CREATE TABLE Card(" +
@@ -46,6 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "FOREIGN KEY (cardStackId) REFERENCES CardStack(cardStackId) ON UPDATE CASCADE ON DELETE CASCADE) "
                 )
                 database.execSQL("INSERT INTO Card(cardId, cardStackId, answer, explanation, text) SELECT cardId, cardStackId, answer, explanation, text FROM CardOLD")
+                database.execSQL("COMMIT")
 
                 //Delete old tables
                 database.execSQL("DROP TABLE Course")
