@@ -17,4 +17,4 @@ data class CardStackDTO(
     @SerializedName("updated_by") val updatedBy: String
 ) : Serializable
 
-fun CardStackDTO.toCardStack(courseId: Long): CardStack = CardStack(id, courseId, name, numCards)
+fun CardStackDTO.toCardStack(): CardStack = CardStack(id, name, numCards)
