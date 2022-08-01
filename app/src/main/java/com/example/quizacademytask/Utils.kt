@@ -10,3 +10,5 @@ fun Context.isTablet(): Boolean {
 fun Toolbar.disableNavBack() {
     navigationIcon = null
 }
+
+

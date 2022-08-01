@@ -25,9 +25,20 @@ class SimpleAdapter(
     @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = list[position]
+        val view = holder.itemView
         holder.row.text = currentItem
         if (position % 2 != 0)
-            holder.itemView.setBackgroundColor((Color.parseColor("#1E1E1E")))
+            view.setBackgroundColor((Color.parseColor("#1E1E1E")))
+
+        //On click
+        view.setOnClickListener {
+            listener.onItemClick(position, view)
+        }
+        //On long click
+        view.setOnLongClickListener {
+            listener.onItemLongClick(position, view)
+            true
+        }
     }
 
     fun deleteItem(position: Int) {
@@ -39,11 +50,7 @@ class SimpleAdapter(
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val row: TextView = itemView.findViewById<TextView>(R.id.rowText)
-
-        init {
-            itemView.setOnClickListener(this)
-        }
+        val row: TextView = itemView.findViewById(R.id.rowText)
 
         override fun onClick(v: View?) {
             val position = adapterPosition
@@ -55,5 +62,6 @@ class SimpleAdapter(
 
     interface OnItemClickListener {
         fun onItemClick(position: Int, v: View?)
+        fun onItemLongClick(position: Int, v: View?)
     }
 }

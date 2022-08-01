@@ -30,7 +30,6 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
-
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     companion object {
@@ -51,6 +50,9 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     private lateinit var courseObj: CourseDTO
     private lateinit var appContext: Context
     private lateinit var binding: FragmentStackListBinding
+    private lateinit var aModeListManager: ListManager
+    private lateinit var actionModeCallback: ActionMode.Callback
+    private var actionMode: Boolean = false
     var isTablet: Boolean = false
 
     override fun onCreateView(
@@ -73,6 +75,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stackMap = HashMap()
         courseJSON = ""
         swipeContainer = binding.swipeContainer
+        aModeListManager = ListManager(HashMap())
         idlingResource = CountingIdlingResource("API")
 
         //Set the toolbar
@@ -83,6 +86,39 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         courseDAO = App.db.courseDao()
         cardStackDAO = App.db.cardStackDAO()
         cardDAO = App.db.cardDAO()
+
+        actionModeCallback = object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+                this@StackListFragment.actionMode = true
+                toolbar.setTitleTextColor(0xFFFF0000.toInt())
+                mode.menuInflater.inflate(R.menu.action_mode_menu, menu)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+                return false
+            }
+
+
+            override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+                when (item.itemId) {
+                    R.id.deleteSelectedButton -> {
+                        //iterate in reverse order to delete the last item first
+                        for (i in aModeListManager.selectedItems.size - 1 downTo 0) {
+                            stacksList.removeAt(i)
+                        }
+                        initArrayAdapters()
+                        mode.finish()
+                        return true
+                    }
+                    else -> return false
+                }
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode) {
+                aModeListManager.emptyList()
+            }
+        }
 
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {
@@ -116,6 +152,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                         stacksAdapter.deleteItem(viewHolder.adapterPosition)
                     }
                 }
+                stacksAdapter.notifyDataSetChanged()
             }
 
         }
@@ -230,6 +267,10 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(position: Int, v: View?) {
+        if (actionMode && v != null) {
+            aModeListManager.process(v.findViewById(R.id.rowText), position)
+            return
+        }
         val item = stacksList[position]
         val stack = stackMap[item]
         val bundle = Bundle()
@@ -243,8 +284,12 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             .commit()
     }
 
+    override fun onItemLongClick(position: Int, v: View?) {
+        requireActivity().startActionMode(actionModeCallback)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.stacks_update_action, menu)
+        inflater.inflate(R.menu.stacks_update_menu, menu)
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -252,5 +297,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         if (item.itemId == R.id.updateButton) getRequest()
         return false
     }
-
 }
+
+
+
