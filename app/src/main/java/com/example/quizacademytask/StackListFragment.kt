@@ -75,7 +75,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stackMap = HashMap()
         courseJSON = ""
         swipeContainer = binding.swipeContainer
-        aModeListManager = ListManager(HashMap())
+        aModeListManager = ListManager(arrayListOf())
         idlingResource = CountingIdlingResource("API")
 
         //Set the toolbar
@@ -99,15 +99,15 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                 return false
             }
 
-
             override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.deleteSelectedButton -> {
-                        //iterate in reverse order to delete the last item first
-                        for (i in aModeListManager.selectedItems.size - 1 downTo 0) {
-                            stacksList.removeAt(i)
+                        for (i in aModeListManager.selectedItems) {
+                            stacksList.remove(i.text)
+                            stacksAdapter.notifyItemRemoved(stacksList.indexOf(i.text))
                         }
-                        initArrayAdapters()
+                        stacksAdapter.notifyDataSetChanged()
+                        actionMode = false
                         mode.finish()
                         return true
                     }
@@ -117,6 +117,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
             override fun onDestroyActionMode(mode: ActionMode) {
                 aModeListManager.emptyList()
+                initSwipeDeleteFunction()
             }
         }
 
@@ -152,9 +153,8 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                         stacksAdapter.deleteItem(viewHolder.adapterPosition)
                     }
                 }
-                stacksAdapter.notifyDataSetChanged()
+                stacksAdapter.notifyItemRemoved(viewHolder.adapterPosition)
             }
-
         }
         val touchHelper = ItemTouchHelper(swipeGesture)
         touchHelper.attachToRecyclerView(recyclerView)
@@ -268,7 +268,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     override fun onItemClick(position: Int, v: View?) {
         if (actionMode && v != null) {
-            aModeListManager.process(v.findViewById(R.id.rowText), position)
+            aModeListManager.process(v.findViewById(R.id.rowText))
             return
         }
         val item = stacksList[position]

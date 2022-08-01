@@ -4,14 +4,14 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 
-class ListManager(var selectedItems: HashMap<Int, View>) {
+class ListManager(var selectedItems: ArrayList<TextView>) {
 
-    fun process(view: TextView, position: Int) {
-        if (!selectedItems.containsKey(position)) {
-            selectedItems[position] = view
+    fun process(view: TextView) {
+        if (!selectedItems.contains(view)) {
+            selectedItems.add(view)
             paintSelected(view)
         } else {
-            selectedItems.remove(position)
+            selectedItems.remove(view)
             paintUnselected(view)
         }
     }
@@ -22,13 +22,12 @@ class ListManager(var selectedItems: HashMap<Int, View>) {
     }
 
     fun emptyList() {
-        for (view in selectedItems.values) paintUnselected(view)
+        for (view in selectedItems) paintUnselected(view)
         selectedItems.clear()
     }
 
     @SuppressLint("ResourceAsColor")
-    fun paintUnselected(view: View) {
-        //paint text white
-        view.findViewById<TextView>(R.id.rowText).setTextColor(0xFFFDFDFD.toInt())
+    fun paintUnselected(view: TextView) {
+        view.setTextColor(0xFFFDFDFD.toInt())
     }
 }
