@@ -14,7 +14,7 @@ class SimpleAdapter(
 ) :
     RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
 
-    val selectedItems = ArrayList<TextView>()
+    private val selectedItems = ArrayList<TextView>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
@@ -45,11 +45,12 @@ class SimpleAdapter(
 
     fun deleteItem(position: Int) {
         list.removeAt(position)
-        notifyDataSetChanged()
+        notifyItemRemoved(position)
     }
 
-    fun deleteInRange(start: Int, end: Int) {
-        list.subList(start, end).clear()
+    fun deleteSelected() {
+        list.removeAll(selectedItems.map { it.text as String }.toSet())
+        notifyDataSetChanged()
     }
 
     fun process(view: TextView) {

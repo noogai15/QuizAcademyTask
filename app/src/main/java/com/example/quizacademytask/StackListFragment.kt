@@ -101,12 +101,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.deleteSelectedButton -> {
-                        for (i in stacksAdapter.selectedItems) {
-                            stacksList.remove(i.text)
-                            stacksAdapter.notifyItemRemoved(stacksList.indexOf(i.text))
-                        }
-
-                        stacksAdapter.notifyDataSetChanged()
+                        stacksAdapter.deleteSelected()
                         actionMode = false
                         mode.finish()
                         return true
