@@ -14,6 +14,8 @@ class SimpleAdapter(
 ) :
     RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
 
+    val selectedItems = ArrayList<TextView>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.row_item,
@@ -44,6 +46,35 @@ class SimpleAdapter(
     fun deleteItem(position: Int) {
         list.removeAt(position)
         notifyDataSetChanged()
+    }
+
+    fun deleteInRange(start: Int, end: Int) {
+        list.subList(start, end).clear()
+    }
+
+    fun process(view: TextView) {
+        if (!selectedItems.contains(view)) {
+            selectedItems.add(view)
+            paintSelected(view)
+        } else {
+            selectedItems.remove(view)
+            paintUnselected(view)
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
+    fun paintSelected(view: View) {
+        view.findViewById<TextView>(R.id.rowText).setTextColor(0xFFFF0000.toInt())
+    }
+
+    fun emptyList() {
+        for (view in selectedItems) paintUnselected(view)
+        selectedItems.clear()
+    }
+
+    @SuppressLint("ResourceAsColor")
+    fun paintUnselected(view: TextView) {
+        view.setTextColor(0xFFFDFDFD.toInt())
     }
 
     override fun getItemCount() = list.size
