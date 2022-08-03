@@ -89,7 +89,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         actionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
                 this@StackListFragment.actionMode = true
-                toolbar.setTitleTextColor(0xFFFF0000.toInt())
                 mode.menuInflater.inflate(R.menu.action_mode_menu, menu)
                 return true
             }

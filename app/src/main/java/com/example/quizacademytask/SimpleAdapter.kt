@@ -65,7 +65,7 @@ class SimpleAdapter(
 
     @SuppressLint("ResourceAsColor")
     fun paintSelected(view: View) {
-        view.findViewById<TextView>(R.id.rowText).setTextColor(0xFFFF0000.toInt())
+        view.findViewById<TextView>(R.id.rowText).setTextColor(0xFF87cefa.toInt())
     }
 
     fun emptyList() {
