@@ -6,22 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 
-class SimpleAdapter(
+class StackListAdapter(
     private val list: ArrayList<String>,
     private val listener: OnItemClickListener,
 ) :
-    RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
+    RecyclerView.Adapter<StackListAdapter.ViewHolder>() {
 
-    private val selectedItems = ArrayList<TextView>()
+    var selectedItems = ArrayList<String>()
+    private lateinit var holder: ViewHolder
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.row_item,
             parent, false
         )
-        return ViewHolder(itemView)
+        holder = ViewHolder(itemView)
+        return holder
     }
 
     @SuppressLint("ResourceAsColor")
@@ -43,22 +47,28 @@ class SimpleAdapter(
         }
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        this.recyclerView = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
     fun deleteItem(position: Int) {
         list.removeAt(position)
-        notifyItemRemoved(position)
+        notifyDataSetChanged()
     }
 
     fun deleteSelected() {
-        list.removeAll(selectedItems.map { it.text as String }.toSet())
+        list.removeAll(selectedItems)
         notifyDataSetChanged()
     }
 
     fun process(view: TextView) {
-        if (!selectedItems.contains(view)) {
-            selectedItems.add(view)
+        val text = view.text as String
+        if (!selectedItems.contains(text)) {
+            selectedItems.add(text)
             paintSelected(view)
         } else {
-            selectedItems.remove(view)
+            selectedItems.remove(text)
             paintUnselected(view)
         }
     }
@@ -69,7 +79,9 @@ class SimpleAdapter(
     }
 
     fun emptyList() {
-        for (view in selectedItems) paintUnselected(view)
+        recyclerView.children.forEach {
+            paintUnselected(it.findViewById(R.id.rowText))
+        }
         selectedItems.clear()
     }
 
@@ -96,4 +108,6 @@ class SimpleAdapter(
         fun onItemClick(position: Int, v: View?)
         fun onItemLongClick(position: Int, v: View?)
     }
+
+
 }
