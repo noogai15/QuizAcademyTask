@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 
+
 class StackListAdapter(
     private val list: ArrayList<String>,
     private val listener: OnItemClickListener,
@@ -48,6 +49,7 @@ class StackListAdapter(
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+
         this.recyclerView = recyclerView
         super.onAttachedToRecyclerView(recyclerView)
     }
@@ -62,7 +64,7 @@ class StackListAdapter(
         notifyDataSetChanged()
     }
 
-    fun process(view: TextView) {
+    fun processSelect(view: TextView) {
         val text = view.text as String
         if (!selectedItems.contains(text)) {
             selectedItems.add(text)
@@ -74,15 +76,8 @@ class StackListAdapter(
     }
 
     @SuppressLint("ResourceAsColor")
-    fun paintSelected(view: View) {
-        view.findViewById<TextView>(R.id.rowText).setTextColor(0xFF87cefa.toInt())
-    }
-
-    fun emptyList() {
-        recyclerView.children.forEach {
-            paintUnselected(it.findViewById(R.id.rowText))
-        }
-        selectedItems.clear()
+    fun paintSelected(view: TextView) {
+        view.setTextColor(0xFF87cefa.toInt())
     }
 
     @SuppressLint("ResourceAsColor")
@@ -90,11 +85,29 @@ class StackListAdapter(
         view.setTextColor(0xFFFDFDFD.toInt())
     }
 
+    fun emptyList() {
+        val x = recyclerView.children.count()
+        recyclerView.children.forEach {
+            paintUnselected(it.findViewById(R.id.rowText))
+        }
+        selectedItems.clear()
+    }
+
+    fun restoreSelectedPaint() {
+//        val childCount = recyclerView.adapter?.itemCount
+//        for (i in 0 until childCount!!) {
+//            val holder = recyclerView.findViewHolderForAdapterPosition(i) as ViewHolder
+//            if (holder.row.text in selectedItems)
+//                paintSelected(holder.row)
+//        }
+    }
+
     override fun getItemCount() = list.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
         val row: TextView = itemView.findViewById(R.id.rowText)
+        val rowLayout: View = itemView.findViewById(R.id.row_layout)
 
         override fun onClick(v: View?) {
             val position = adapterPosition
@@ -108,6 +121,4 @@ class StackListAdapter(
         fun onItemClick(position: Int, v: View?)
         fun onItemLongClick(position: Int, v: View?)
     }
-
-
 }

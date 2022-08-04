@@ -40,7 +40,11 @@ android {
 
 dependencies {
     def roomVersion = "2.4.2"
+    def activityVersion = "1.5.1"
+    def fragmentVersion = "1.5.1"
     implementation("androidx.room:room-runtime:$roomVersion")
+    implementation "androidx.activity:activity-ktx:$activityVersion"
+    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation("androidx.room:room-ktx:$roomVersion")

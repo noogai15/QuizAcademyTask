@@ -31,7 +31,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
-class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
+class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
 
     companion object {
         private const val COURSE_ID: Long = 28
@@ -40,7 +40,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     private lateinit var swipeContainer: SwipeRefreshLayout
     private lateinit var toolbar: Toolbar
     private lateinit var recyclerView: RecyclerView
-    private lateinit var stacksAdapter: SimpleAdapter
+    private lateinit var stacksAdapter: StackListAdapter
     private lateinit var stacksList: ArrayList<String>
     private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
     private lateinit var courseJSON: String
@@ -69,7 +69,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         recyclerView = binding.recyclerView
         stacksList = ArrayList()
         isTablet = resources.getBoolean(R.bool.isTablet)
-        initArrayAdapters()
+        initArrayAdapter()
         initSwipeDeleteFunction()
         recyclerView.adapter = stacksAdapter
         stackMap = HashMap()
@@ -85,6 +85,16 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         courseDAO = App.db.courseDao()
         cardStackDAO = App.db.cardStackDAO()
         cardDAO = App.db.cardDAO()
+
+        /*Check if course already exists in database. If not then download and insert*/
+        runBlocking {
+            launch {
+                if (!courseDAO.isExists(COURSE_ID))
+                    getRequest()
+                else
+                    refillStacksList()
+            }
+        }
 
         actionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -115,22 +125,21 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             }
         }
 
-        /*Check if course already exists in database. If not then download and insert*/
-        runBlocking {
-            launch {
-                if (!courseDAO.isExists(COURSE_ID))
-                    getRequest()
-                else
-                    refillStacksList()
-            }
-        }
-
         //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
             getRequest()
             swipeContainer.isRefreshing = false
         }
 
+        //SAVE INSTANCE STATE
+        if (savedInstanceState != null) {
+            actionMode = savedInstanceState.getBoolean("actionMode")
+            stacksAdapter.selectedItems =
+                savedInstanceState.getStringArrayList("selectedList") as ArrayList<String>
+            if (actionMode) requireActivity().startActionMode(actionModeCallback)
+            stacksAdapter.restoreSelectedPaint()
+            recyclerView.adapter = stacksAdapter
+        }
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -155,8 +164,8 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     }
 
     /* Initialize the array adapters */
-    private fun initArrayAdapters() {
-        stacksAdapter = SimpleAdapter(stacksList, this)
+    private fun initArrayAdapter() {
+        stacksAdapter = StackListAdapter(stacksList, this)
     }
 
     /* Create a Course from JSON */
@@ -262,7 +271,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     override fun onItemClick(position: Int, v: View?) {
         if (actionMode && v != null) {
-            stacksAdapter.process(v.findViewById<TextView?>(R.id.rowText))
+            stacksAdapter.processSelect(v.findViewById<TextView?>(R.id.rowText))
             return
         }
         val item = stacksList[position]
@@ -291,6 +300,14 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         if (item.itemId == R.id.updateButton) getRequest()
         return false
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putStringArrayList("selectedList", stacksAdapter.selectedItems)
+        outState.putBoolean("actionMode", actionMode)
+        outState.putParcelable("stacksAdapter", stacksAdapter)
+        super.onSaveInstanceState(outState)
+    }
+
 }
 
 
