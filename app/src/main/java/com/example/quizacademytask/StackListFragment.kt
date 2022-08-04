@@ -1,8 +1,5 @@
 package com.example.quizacademytask
 
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -38,7 +35,6 @@ private lateinit var idlingResource: CountingIdlingResource
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
 private lateinit var courseObj: CourseDTO
-private lateinit var appContext: Context
 private lateinit var binding: FragmentStackListBinding
 var isTablet: Boolean = false
 
@@ -52,7 +48,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding = FragmentStackListBinding.inflate(inflater, container, false)
 
         //INITS
-        appContext = requireActivity().applicationContext
         recyclerView = binding.recyclerView
         stacksList = ArrayList()
         isTablet = resources.getBoolean(R.bool.isTablet)
@@ -145,14 +140,9 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         EspressoIdlingResource.increment()
         val url = "https://api.quizacademy.io/quiz-dev/public/courses/$courseId"
         val client = OkHttpClient()
-        val ai: ApplicationInfo = appContext.packageManager.getApplicationInfo(
-            appContext.packageName,
-            PackageManager.GET_META_DATA
-        )
-        val value: String = ai.metaData["apiKey"] as String
 
         val request: Request = Request.Builder()
-            .header("x-api-key", value)
+            .header("x-api-key", App.apiKey)
             .url(url)
             .build()
 
