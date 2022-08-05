@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainViewModel : ViewModel() {
-    public val stacksList by lazy { ArrayList<String>() }
+    val stacksList by lazy { ArrayList<String>() }
     val stackMap by lazy { HashMap<String, CardStack>() }
     private val cardDAO by lazy { App.db.cardDAO() }
     private val cardStackDAO by lazy { App.db.cardStackDAO() }
-    public lateinit var cardStacks: List<CardStack>
+    lateinit var cardStacks: List<CardStack>
     private lateinit var courseObj: CourseDTO
-    public var courseJSON: String = ""
+    var courseJSON: String = ""
 
     init {
         fetchCardStacks()
@@ -24,9 +24,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun fetchCardStacks() {
-        runBlocking {
-            launch { cardStacks = cardStackDAO.getAll() }
-        }
+        runBlocking { launch { cardStacks = cardStackDAO.getAll() } }
     }
 
     /* Refill the card stacks list */

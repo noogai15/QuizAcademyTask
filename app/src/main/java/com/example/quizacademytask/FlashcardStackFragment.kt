@@ -44,9 +44,7 @@ class FlashcardStackFragment : Fragment() {
         requireActivity().setActionBar(toolbar)
         toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
 
-        if (appContext.isTablet()) {
-            toolbar.disableNavBack()
-        }
+        if (appContext.isTablet()) toolbar.disableNavBack()
 
         //If no stack has been clicked yet, leave the rest of the fragment empty
         if (stack == null) return binding.root

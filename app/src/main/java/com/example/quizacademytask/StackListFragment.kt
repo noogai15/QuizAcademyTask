@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
-import db.dao.CardDAO
-import db.dao.CardStackDAO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
@@ -23,11 +21,8 @@ import java.io.IOException
 
 private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
-private lateinit var stacksList: ArrayList<String>
 private lateinit var recyclerView: RecyclerView
 private lateinit var idlingResource: CountingIdlingResource
-private lateinit var cardStackDAO: CardStackDAO
-private lateinit var cardDAO: CardDAO
 private lateinit var stacksAdapter: SimpleAdapter
 private lateinit var binding: FragmentStackListBinding
 private lateinit var model: MainViewModel
@@ -44,8 +39,15 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding = FragmentStackListBinding.inflate(inflater, container, false)
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java]
 
+        /*Check if course already exists in database. If not then download and insert*/
+        runBlocking {
+            launch {
+                if (model.cardStacks.isEmpty())
+                    getRequest()
+            }
+        }
+
         //INITS
-        stacksList = model.stacksList
         recyclerView = binding.recyclerView
         isTablet = resources.getBoolean(R.bool.isTablet)
         initArrayAdapters()
@@ -54,20 +56,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         swipeContainer = binding.swipeContainer
         idlingResource = CountingIdlingResource("API")
         binding.toolbarStackList.title = "Topics"
-
-        //DATABASE
-        cardStackDAO = App.db.cardStackDAO()
-        cardDAO = App.db.cardDAO()
-
-        /*Check if course already exists in database. If not then download and insert*/
-        runBlocking {
-            launch {
-                if (model.cardStacks.isEmpty())
-                    getRequest()
-                else
-                    model.refillStacksList()
-            }
-        }
 
         //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
@@ -100,7 +88,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     /* Initialize the array adapters */
     private fun initArrayAdapters() {
-        stacksAdapter = SimpleAdapter(stacksList, this)
+        stacksAdapter = SimpleAdapter(model.stacksList, this)
     }
 
 
@@ -143,7 +131,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                             .show()
                         model.createStacks(model.courseJSON)
                         model.refillStacksList()
-                        initSwipeDeleteFunction()
+                        stacksAdapter.notifyDataSetChanged()
                     }
                 }
                 EspressoIdlingResource.decrement()
@@ -153,7 +141,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
 
     override fun onItemClick(position: Int, v: View?) {
-        val item = stacksList[position]
+        val item = model.stacksList[position]
         val stack = model.stackMap[item]
         val bundle = Bundle()
         bundle.putSerializable("stack", stack)
