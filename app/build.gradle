@@ -48,9 +48,16 @@ android {
 
 dependencies {
     def roomVersion = "2.4.2"
+    def activityVersion = "1.5.1"
+    def fragmentVersion = "1.5.1"
+    def lifecycleVersion = "2.6.0-alpha01"
     implementation "androidx.room:room-testing:$roomVersion"
+    implementation "androidx.activity:activity-ktx:$activityVersion"
+    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.6.21"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
     kapt "androidx.room:room-compiler:$roomVersion"

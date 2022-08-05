@@ -3,6 +3,7 @@ package com.example.quizacademytask
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.quizacademytask.databinding.ActivityMainBinding
 import db.AppDatabase
 
@@ -11,6 +12,7 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+    val model: MainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

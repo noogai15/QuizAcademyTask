@@ -12,10 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
-import com.example.quizacademytask.dto.CourseDTO
-import com.example.quizacademytask.dto.toCard
-import com.example.quizacademytask.dto.toCardStack
-import com.google.gson.Gson
 import db.dao.CardDAO
 import db.dao.CardStackDAO
 import db.entities.CardStack
@@ -26,16 +22,15 @@ import java.io.IOException
 
 private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
-private lateinit var recyclerView: RecyclerView
-private lateinit var stacksAdapter: SimpleAdapter
 private lateinit var stacksList: ArrayList<String>
-private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
-private lateinit var courseJSON: String
+private lateinit var recyclerView: RecyclerView
 private lateinit var idlingResource: CountingIdlingResource
 private lateinit var cardStackDAO: CardStackDAO
 private lateinit var cardDAO: CardDAO
-private lateinit var courseObj: CourseDTO
+private lateinit var stacksAdapter: SimpleAdapter
 private lateinit var binding: FragmentStackListBinding
+private lateinit var model: MainViewModel
+
 var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
@@ -48,15 +43,15 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         binding = FragmentStackListBinding.inflate(inflater, container, false)
 
         //INITS
+        stacksList = model.getStacksList()
+
+        //initialize viewmodel
         recyclerView = binding.recyclerView
-        stacksList = ArrayList()
         isTablet = resources.getBoolean(R.bool.isTablet)
         initArrayAdapters()
         initSwipeDeleteFunction()
         recyclerView.adapter = stacksAdapter
-        stackMap = HashMap()
-        courseJSON = ""
-        swipeContainer = binding.swipeContainer
+//        swipeContainer = binding.swipeContainer
         idlingResource = CountingIdlingResource("API")
         binding.toolbarStackList.title = "Topics"
 
@@ -108,32 +103,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(stacksList, this)
     }
 
-    /* Create a CardStack's from JSON */
-    private fun createStacks(jsonString: String): List<CardStack>? {
-        var cardStacks: List<CardStack>? = null
-        runBlocking {
-            launch {
-                courseObj = gsonParse(jsonString)
-                cardStacks = dbEntries(courseObj)
-            }
-        }
-        return cardStacks
-    }
-
-    /* Create a DTO from JSON */
-    private fun gsonParse(jsonString: String): CourseDTO {
-        return Gson().fromJson(jsonString, CourseDTO::class.java)
-    }
-
-    private suspend fun dbEntries(courseObj: CourseDTO): List<CardStack> {
-        for (stack in courseObj.cardStacks) {
-            cardStackDAO.insert(stack.toCardStack())
-            for (card in stack.cards) {
-                cardDAO.insert(card.toCard(stack.id))
-            }
-        }
-        return cardStackDAO.getAll()
-    }
 
     /* Send GET request to API*/
     private fun getRequest() {
@@ -164,7 +133,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unsuccessful response")
-                    courseJSON = response.body?.string()!!
+                    model.courseJSON = response.body?.string()!!
                     activity!!.runOnUiThread {
                         Toast.makeText(
                             activity,
@@ -172,7 +141,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                             Toast.LENGTH_SHORT,
                         )
                             .show()
-                        createStacks(courseJSON)
+                        model.createStacks(model.courseJSON)
                         refillStacksList()
                         initSwipeDeleteFunction()
                     }
@@ -190,7 +159,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                 val cardStacks: List<CardStack> = cardStackDAO.getAll()
                 for (stack in cardStacks) {
                     stacksList.add(stack.name)
-                    stackMap[stack.name] = stack
+                    model.stackMap[stack.name] = stack
                 }
                 stacksAdapter.notifyDataSetChanged()
                 stacksList.sortBy { it } //Alphabetical sort
@@ -200,7 +169,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     override fun onItemClick(position: Int, v: View?) {
         val item = stacksList[position]
-        val stack = stackMap[item]
+        val stack = model.stackMap[item]
         val bundle = Bundle()
         bundle.putSerializable("stack", stack)
         val fragment = FlashcardStackFragment()
