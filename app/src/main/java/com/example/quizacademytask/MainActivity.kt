@@ -12,12 +12,12 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    val model: MainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+    public lateinit var model: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        model = ViewModelProvider(this)[MainViewModel::class.java]
         //Initiate/Get database instance
         AppDatabase.getInstance(this)
 

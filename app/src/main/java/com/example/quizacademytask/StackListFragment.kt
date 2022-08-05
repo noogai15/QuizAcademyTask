@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -14,11 +15,11 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
 import db.dao.CardDAO
 import db.dao.CardStackDAO
-import db.entities.CardStack
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
+
 
 private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
@@ -41,17 +42,16 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     ): View? {
 
         binding = FragmentStackListBinding.inflate(inflater, container, false)
+        model = ViewModelProvider(requireActivity())[MainViewModel::class.java]
 
         //INITS
-        stacksList = model.getStacksList()
-
-        //initialize viewmodel
+        stacksList = model.stacksList
         recyclerView = binding.recyclerView
         isTablet = resources.getBoolean(R.bool.isTablet)
         initArrayAdapters()
         initSwipeDeleteFunction()
         recyclerView.adapter = stacksAdapter
-//        swipeContainer = binding.swipeContainer
+        swipeContainer = binding.swipeContainer
         idlingResource = CountingIdlingResource("API")
         binding.toolbarStackList.title = "Topics"
 
@@ -62,10 +62,10 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         /*Check if course already exists in database. If not then download and insert*/
         runBlocking {
             launch {
-                if (cardStackDAO.getAll().isEmpty())
+                if (model.cardStacks.isEmpty())
                     getRequest()
                 else
-                    refillStacksList()
+                    model.refillStacksList()
             }
         }
 
@@ -142,7 +142,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
                         )
                             .show()
                         model.createStacks(model.courseJSON)
-                        refillStacksList()
+                        model.refillStacksList()
                         initSwipeDeleteFunction()
                     }
                 }
@@ -151,21 +151,6 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         })
     }
 
-    /* Refill the card stacks list */
-    fun refillStacksList() {
-        stacksList.clear()
-        runBlocking {
-            launch {
-                val cardStacks: List<CardStack> = cardStackDAO.getAll()
-                for (stack in cardStacks) {
-                    stacksList.add(stack.name)
-                    model.stackMap[stack.name] = stack
-                }
-                stacksAdapter.notifyDataSetChanged()
-                stacksList.sortBy { it } //Alphabetical sort
-            }
-        }
-    }
 
     override fun onItemClick(position: Int, v: View?) {
         val item = stacksList[position]

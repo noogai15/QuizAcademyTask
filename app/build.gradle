@@ -57,7 +57,6 @@ dependencies {
     androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.6.21"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
     kapt "androidx.room:room-compiler:$roomVersion"

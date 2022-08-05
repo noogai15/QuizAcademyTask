@@ -1,6 +1,5 @@
 package com.example.quizacademytask
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.quizacademytask.dto.CourseDTO
 import com.example.quizacademytask.dto.toCard
@@ -11,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainViewModel : ViewModel() {
-    public val stacksList by lazy { MutableLiveData<ArrayList<String>>().also { refillStacksList() } }
+    public val stacksList by lazy { ArrayList<String>() }
     val stackMap by lazy { HashMap<String, CardStack>() }
     private val cardDAO by lazy { App.db.cardDAO() }
     private val cardStackDAO by lazy { App.db.cardStackDAO() }
@@ -19,31 +18,28 @@ class MainViewModel : ViewModel() {
     private lateinit var courseObj: CourseDTO
     public var courseJSON: String = ""
 
+    init {
+        fetchCardStacks()
+        refillStacksList()
+    }
+
     private fun fetchCardStacks() {
-        var result: List<CardStack>
         runBlocking {
-            launch {
-                cardStacks = cardStackDAO.getAll()
-            }
+            launch { cardStacks = cardStackDAO.getAll() }
         }
     }
 
-    @JvmName("getStacksList1")
-    fun getStacksList(): ArrayList<String> = stacksList.value!!
-
     /* Refill the card stacks list */
-    private fun refillStacksList() {
-        for (i in 0 until stacksList.value!!.size) {
-            stacksList.value!!.removeAt(i)
-        }
+    fun refillStacksList() {
+        stacksList.clear()
         runBlocking {
             launch {
                 cardStacks = cardStackDAO.getAll()
                 for (stack in cardStacks) {
-                    stacksList.value!!.add(stack.name)
+                    stacksList.add(stack.name)
                     stackMap[stack.name] = stack
                 }
-                stacksList.value!!.sortBy { it } //Alphabetical sort
+                stacksList.sortBy { it } //Alphabetical sort
             }
         }
     }
