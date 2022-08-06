@@ -137,7 +137,6 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
             stacksAdapter.selectedItems =
                 savedInstanceState.getSerializable("selectedList") as HashMap<Int, String>
             if (actionMode) requireActivity().startActionMode(actionModeCallback)
-            stacksAdapter.restoreSelectedPaint()
             recyclerView.adapter = stacksAdapter
         }
         // Inflate the layout for this fragment
