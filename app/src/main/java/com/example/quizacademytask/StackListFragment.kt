@@ -135,7 +135,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
         if (savedInstanceState != null) {
             actionMode = savedInstanceState.getBoolean("actionMode")
             stacksAdapter.selectedItems =
-                savedInstanceState.getStringArrayList("selectedList") as ArrayList<String>
+                savedInstanceState.getSerializable("selectedList") as HashMap<Int, String>
             if (actionMode) requireActivity().startActionMode(actionModeCallback)
             stacksAdapter.restoreSelectedPaint()
             recyclerView.adapter = stacksAdapter
@@ -271,7 +271,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
 
     override fun onItemClick(position: Int, v: View?) {
         if (actionMode && v != null) {
-            stacksAdapter.processSelect(v.findViewById<TextView?>(R.id.rowText))
+            stacksAdapter.processSelect(position, v.findViewById<TextView?>(R.id.rowText))
             return
         }
         val item = stacksList[position]
@@ -289,6 +289,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
 
     override fun onItemLongClick(position: Int, v: View?) {
         requireActivity().startActionMode(actionModeCallback)
+        onItemClick(position, v)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -302,9 +303,8 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putStringArrayList("selectedList", stacksAdapter.selectedItems)
+        outState.putSerializable("selectedList", stacksAdapter.selectedItems)
         outState.putBoolean("actionMode", actionMode)
-        outState.putParcelable("stacksAdapter", stacksAdapter)
         super.onSaveInstanceState(outState)
     }
 

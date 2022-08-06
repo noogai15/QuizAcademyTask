@@ -16,7 +16,7 @@ class StackListAdapter(
 ) :
     RecyclerView.Adapter<StackListAdapter.ViewHolder>() {
 
-    var selectedItems = ArrayList<String>()
+    var selectedItems = HashMap<Int, String>()
     private lateinit var holder: ViewHolder
     private lateinit var recyclerView: RecyclerView
 
@@ -36,7 +36,8 @@ class StackListAdapter(
         holder.row.text = currentItem
         if (position % 2 != 0)
             view.setBackgroundColor((Color.parseColor("#1E1E1E")))
-
+        if (holder.row.text in selectedItems.values)
+            paintSelected(holder.row)
         //On click
         view.setOnClickListener {
             listener.onItemClick(position, view)
@@ -60,17 +61,17 @@ class StackListAdapter(
     }
 
     fun deleteSelected() {
-        list.removeAll(selectedItems)
+        list.removeAll(selectedItems.values)
         notifyDataSetChanged()
     }
 
-    fun processSelect(view: TextView) {
+    fun processSelect(position: Int, view: TextView) {
         val text = view.text as String
-        if (!selectedItems.contains(text)) {
-            selectedItems.add(text)
+        if (!selectedItems.values.contains(text)) {
+            selectedItems[position] = text
             paintSelected(view)
         } else {
-            selectedItems.remove(text)
+            selectedItems.remove(position)
             paintUnselected(view)
         }
     }
@@ -91,15 +92,6 @@ class StackListAdapter(
             paintUnselected(it.findViewById(R.id.rowText))
         }
         selectedItems.clear()
-    }
-
-    fun restoreSelectedPaint() {
-//        val childCount = recyclerView.adapter?.itemCount
-//        for (i in 0 until childCount!!) {
-//            val holder = recyclerView.findViewHolderForAdapterPosition(i) as ViewHolder
-//            if (holder.row.text in selectedItems)
-//                paintSelected(holder.row)
-//        }
     }
 
     override fun getItemCount() = list.size
