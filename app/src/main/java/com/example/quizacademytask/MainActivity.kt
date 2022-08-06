@@ -1,12 +1,15 @@
 package com.example.quizacademytask
 
 import android.os.Bundle
-import androidx.activity.viewModels
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import com.example.quizacademytask.databinding.ActivityMainBinding
 import db.AppDatabase
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MenuProvider {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -18,7 +21,6 @@ class MainActivity : AppCompatActivity() {
 
         //Initiate/Get database instance
         AppDatabase.getInstance(this)
-
         if (savedInstanceState == null) {
             if (this.isTablet()) {
                 supportFragmentManager.beginTransaction()
@@ -30,5 +32,13 @@ class MainActivity : AppCompatActivity() {
                     .commit()
             }
         }
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        TODO("Not yet implemented")
     }
 }

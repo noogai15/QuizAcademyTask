@@ -8,8 +8,9 @@ import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -61,7 +62,21 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
     ): View? {
 
         binding = FragmentStackListBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
+        val menuHost = requireActivity() as MenuHost
+
+        //Init MenuProvider
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+                inflater.inflate(R.menu.stacks_update_menu, menu)
+            }
+
+            override fun onMenuItemSelected(item: MenuItem): Boolean {
+                when (item.itemId) {
+                    R.id.updateButton -> getRequest()
+                }
+                return true
+            }
+        })
 
         //INITS
         appContext = requireActivity().applicationContext
@@ -78,8 +93,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
         idlingResource = CountingIdlingResource("API")
 
         //Set the toolbar
-        binding.toolbarStackList.title = "Topics"
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.title = "Topics"
 
         //DATABASE
         courseDAO = App.db.courseDao()
@@ -122,6 +136,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
             override fun onDestroyActionMode(mode: ActionMode) {
                 stacksAdapter.emptyList()
                 initSwipeDeleteFunction()
+                actionMode = false
             }
         }
 
@@ -289,16 +304,6 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
     override fun onItemLongClick(position: Int, v: View?) {
         requireActivity().startActionMode(actionModeCallback)
         onItemClick(position, v)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.stacks_update_menu, menu)
-        return super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.updateButton) getRequest()
-        return false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
