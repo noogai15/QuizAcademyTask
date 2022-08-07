@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
@@ -134,7 +133,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
             }
 
             override fun onDestroyActionMode(mode: ActionMode) {
-                stacksAdapter.emptyList()
+                stacksAdapter.emptyList(recyclerView)
                 initSwipeDeleteFunction()
                 actionMode = false
             }
@@ -150,7 +149,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
         if (savedInstanceState != null) {
             actionMode = savedInstanceState.getBoolean("actionMode")
             stacksAdapter.selectedItems =
-                savedInstanceState.getSerializable("selectedList") as HashMap<Int, String>
+                savedInstanceState.getIntegerArrayList("selectedList") as ArrayList<Int>
             if (actionMode) requireActivity().startActionMode(actionModeCallback)
             recyclerView.adapter = stacksAdapter
         }
@@ -285,7 +284,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
 
     override fun onItemClick(position: Int, v: View?) {
         if (actionMode && v != null) {
-            stacksAdapter.processSelect(position, v.findViewById<TextView?>(R.id.rowText))
+            stacksAdapter.processSelect(position, v.findViewById(R.id.rowText))
             return
         }
         val item = stacksList[position]
@@ -307,7 +306,7 @@ class StackListFragment : Fragment(), StackListAdapter.OnItemClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable("selectedList", stacksAdapter.selectedItems)
+        outState.putIntegerArrayList("selectedList", stacksAdapter.selectedItems)
         outState.putBoolean("actionMode", actionMode)
         super.onSaveInstanceState(outState)
     }
