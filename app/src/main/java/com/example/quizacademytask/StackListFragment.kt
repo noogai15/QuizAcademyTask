@@ -1,7 +1,6 @@
 package com.example.quizacademytask
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,23 +12,23 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import okhttp3.*
-import java.io.IOException
 
 
-private val courseId: Long = 28
 private lateinit var swipeContainer: SwipeRefreshLayout
 private lateinit var recyclerView: RecyclerView
 private lateinit var idlingResource: CountingIdlingResource
 private lateinit var stacksAdapter: SimpleAdapter
 private lateinit var binding: FragmentStackListBinding
 private lateinit var model: MainViewModel
+private val backendClient: BackendClient = BackendClient()
 
 var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
+
+    companion object {
+        const val COURSE_ID = 28
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,12 +39,8 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java]
 
         /*Check if course already exists in database. If not then download and insert*/
-        runBlocking {
-            launch {
-                if (model.cardStacks.isEmpty())
-                    getRequest()
-            }
-        }
+        if (model.cardStacks.isEmpty())
+            handleGetCourse()
 
         //INITS
         recyclerView = binding.recyclerView
@@ -59,7 +54,7 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
         //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
-            getRequest()
+            handleGetCourse()
             swipeContainer.isRefreshing = false
         }
 
@@ -91,50 +86,28 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         stacksAdapter = SimpleAdapter(model.stacksList, this)
     }
 
-
-    /* Send GET request to API*/
-    private fun getRequest() {
-        EspressoIdlingResource.increment()
-        val url = "https://api.quizacademy.io/quiz-dev/public/courses/$courseId"
-        val client = OkHttpClient()
-
-        val request: Request = Request.Builder()
-            .header("x-api-key", App.apiKey)
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                activity!!.runOnUiThread {
-                    Toast.makeText(
-                        activity,
-                        "Error downloading course",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-                Log.e("JSON", e.toString())
-                e.printStackTrace()
-                EspressoIdlingResource.decrement()
+    private fun handleGetCourse() {
+        backendClient.requestCourse(COURSE_ID, { courseJSON ->
+            model.courseJSON = courseJSON
+            model.createStacks()
+            model.refillStacksList()
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    activity,
+                    "Course downloaded",
+                    Toast.LENGTH_SHORT,
+                )
+                    .show()
+                stacksAdapter.notifyDataSetChanged()
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unsuccessful response")
-                    model.courseJSON = response.body?.string()!!
-                    activity!!.runOnUiThread {
-                        Toast.makeText(
-                            activity,
-                            "Course downloaded",
-                            Toast.LENGTH_SHORT,
-                        )
-                            .show()
-                        model.createStacks(model.courseJSON)
-                        model.refillStacksList()
-                        stacksAdapter.notifyDataSetChanged()
-                    }
-                }
-                EspressoIdlingResource.decrement()
+        }, {
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    activity,
+                    "Error downloading course",
+                    Toast.LENGTH_SHORT,
+                )
+                    .show()
             }
         })
     }
@@ -153,5 +126,4 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         ft.addToBackStack(null)
             .commit()
     }
-
 }

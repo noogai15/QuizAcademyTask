@@ -43,11 +43,11 @@ class MainViewModel : ViewModel() {
     }
 
     /* Create a CardStack's from JSON */
-    fun createStacks(jsonString: String): List<CardStack>? {
+    fun createStacks(): List<CardStack>? {
         var cardStacks: List<CardStack>? = null
         runBlocking {
             launch {
-                courseObj = gsonParse(jsonString)
+                courseObj = gsonParse(courseJSON)
                 cardStacks = dbEntries(courseObj)
             }
         }
