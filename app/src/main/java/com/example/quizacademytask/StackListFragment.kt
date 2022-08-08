@@ -1,48 +1,34 @@
 package com.example.quizacademytask
 
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.example.quizacademytask.databinding.FragmentStackListBinding
-import com.example.quizacademytask.dto.CourseDTO
-import com.example.quizacademytask.dto.toCard
-import com.example.quizacademytask.dto.toCardStack
-import com.google.gson.Gson
-import db.dao.CardDAO
-import db.dao.CardStackDAO
-import db.entities.CardStack
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import okhttp3.*
-import java.io.IOException
 
-private val courseId: Long = 28
+
 private lateinit var swipeContainer: SwipeRefreshLayout
 private lateinit var recyclerView: RecyclerView
-private lateinit var stacksAdapter: SimpleAdapter
-private lateinit var stacksList: ArrayList<String>
-private lateinit var stackMap: HashMap<String, CardStack> //Pairing stack names and the stacks
-private lateinit var courseJSON: String
 private lateinit var idlingResource: CountingIdlingResource
-private lateinit var cardStackDAO: CardStackDAO
-private lateinit var cardDAO: CardDAO
-private lateinit var courseObj: CourseDTO
-private lateinit var appContext: Context
+private lateinit var stacksAdapter: SimpleAdapter
 private lateinit var binding: FragmentStackListBinding
+private lateinit var model: MainViewModel
+private val backendClient: BackendClient = BackendClient()
+
 var isTablet: Boolean = false
 
 class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
+
+    companion object {
+        const val COURSE_ID = 28
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,38 +36,25 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
     ): View? {
 
         binding = FragmentStackListBinding.inflate(inflater, container, false)
+        model = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+
+        /*Check if course already exists in database. If not then download and insert*/
+        if (model.cardStacks.isEmpty())
+            handleGetCourse()
 
         //INITS
-        appContext = requireActivity().applicationContext
         recyclerView = binding.recyclerView
-        stacksList = ArrayList()
         isTablet = resources.getBoolean(R.bool.isTablet)
         initArrayAdapters()
         initSwipeDeleteFunction()
         recyclerView.adapter = stacksAdapter
-        stackMap = HashMap()
-        courseJSON = ""
         swipeContainer = binding.swipeContainer
         idlingResource = CountingIdlingResource("API")
         binding.toolbarStackList.title = "Topics"
 
-        //DATABASE
-        cardStackDAO = App.db.cardStackDAO()
-        cardDAO = App.db.cardDAO()
-
-        /*Check if course already exists in database. If not then download and insert*/
-        runBlocking {
-            launch {
-                if (cardStackDAO.getAll().isEmpty())
-                    getRequest()
-                else
-                    refillStacksList()
-            }
-        }
-
         //SWIPE REFRESH SETTINGS; Updates from API
         swipeContainer.setOnRefreshListener {
-            getRequest()
+            handleGetCourse()
             swipeContainer.isRefreshing = false
         }
 
@@ -110,107 +83,39 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
     /* Initialize the array adapters */
     private fun initArrayAdapters() {
-        stacksAdapter = SimpleAdapter(stacksList, this)
+        stacksAdapter = SimpleAdapter(model.stacksList, this)
     }
 
-    /* Create a CardStack's from JSON */
-    private fun createStacks(jsonString: String): List<CardStack>? {
-        var cardStacks: List<CardStack>? = null
-        runBlocking {
-            launch {
-                courseObj = gsonParse(jsonString)
-                cardStacks = dbEntries(courseObj)
+    private fun handleGetCourse() {
+        backendClient.requestCourse(COURSE_ID, { courseJSON ->
+            model.courseJSON = courseJSON
+            model.createStacks()
+            model.refillStacksList()
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    activity,
+                    "Course downloaded",
+                    Toast.LENGTH_SHORT,
+                )
+                    .show()
+                stacksAdapter.notifyDataSetChanged()
             }
-        }
-        return cardStacks
-    }
-
-    /* Create a DTO from JSON */
-    private fun gsonParse(jsonString: String): CourseDTO {
-        return Gson().fromJson(jsonString, CourseDTO::class.java)
-    }
-
-    private suspend fun dbEntries(courseObj: CourseDTO): List<CardStack> {
-        for (stack in courseObj.cardStacks) {
-            cardStackDAO.insert(stack.toCardStack())
-            for (card in stack.cards) {
-                cardDAO.insert(card.toCard(stack.id))
-            }
-        }
-        return cardStackDAO.getAll()
-    }
-
-    /* Send GET request to API*/
-    private fun getRequest() {
-        EspressoIdlingResource.increment()
-        val url = "https://api.quizacademy.io/quiz-dev/public/courses/$courseId"
-        val client = OkHttpClient()
-        val ai: ApplicationInfo = appContext.packageManager.getApplicationInfo(
-            appContext.packageName,
-            PackageManager.GET_META_DATA
-        )
-        val value: String = ai.metaData["apiKey"] as String
-
-        val request: Request = Request.Builder()
-            .header("x-api-key", value)
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                activity!!.runOnUiThread {
-                    Toast.makeText(
-                        activity,
-                        "Error downloading course",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-                Log.e("JSON", e.toString())
-                e.printStackTrace()
-                EspressoIdlingResource.decrement()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unsuccessful response")
-                    courseJSON = response.body?.string()!!
-                    activity!!.runOnUiThread {
-                        Toast.makeText(
-                            activity,
-                            "Course downloaded",
-                            Toast.LENGTH_SHORT,
-                        )
-                            .show()
-                        createStacks(courseJSON)
-                        refillStacksList()
-                        initSwipeDeleteFunction()
-                    }
-                }
-                EspressoIdlingResource.decrement()
+        }, {
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    activity,
+                    "Error downloading course",
+                    Toast.LENGTH_SHORT,
+                )
+                    .show()
             }
         })
     }
 
-    /* Refill the card stacks list */
-    fun refillStacksList() {
-        stacksList.clear()
-        runBlocking {
-            launch {
-                val cardStacks: List<CardStack> = cardStackDAO.getAll()
-                for (stack in cardStacks) {
-                    stacksList.add(stack.name)
-                    stackMap[stack.name] = stack
-                }
-                stacksAdapter.notifyDataSetChanged()
-                stacksList.sortBy { it } //Alphabetical sort
-            }
-        }
-    }
 
     override fun onItemClick(position: Int, v: View?) {
-        val item = stacksList[position]
-        val stack = stackMap[item]
+        val item = model.stacksList[position]
+        val stack = model.stackMap[item]
         val bundle = Bundle()
         bundle.putSerializable("stack", stack)
         val fragment = FlashcardStackFragment()
@@ -221,5 +126,4 @@ class StackListFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         ft.addToBackStack(null)
             .commit()
     }
-
 }
